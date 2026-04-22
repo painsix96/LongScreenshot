@@ -1,0 +1,97 @@
+{
+  "configurations" : [
+    {
+      "id" : "iPhone15Pro-Light",
+      "name" : "iPhone 15 Pro - Light Mode",
+      "options" : {
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:LongScreenshot.xcodeproj",
+          "identifier" : "A1B2C3CF0000000000000000",
+          "name" : "LongScreenshot"
+        },
+        "testExecutionOrdering" : "random",
+        "userInfo" : {
+          "UITestAppearance" : "light"
+        }
+      }
+    },
+    {
+      "id" : "iPhone15Pro-Dark",
+      "name" : "iPhone 15 Pro - Dark Mode",
+      "options" : {
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:LongScreenshot.xcodeproj",
+          "identifier" : "A1B2C3CF0000000000000000",
+          "name" : "LongScreenshot"
+        },
+        "testExecutionOrdering" : "random",
+        "userInfo" : {
+          "UITestAppearance" : "dark"
+        }
+      }
+    },
+    {
+      "id" : "iPhoneSE-Light",
+      "name" : "iPhone SE - Light Mode",
+      "options" : {
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:LongScreenshot.xcodeproj",
+          "identifier" : "A1B2C3CF0000000000000000",
+          "name" : "LongScreenshot"
+        },
+        "testExecutionOrdering" : "random",
+        "userInfo" : {
+          "UITestAppearance" : "light"
+        }
+      }
+    },
+    {
+      "id" : "iPhoneSE-Dark",
+      "name" : "iPhone SE - Dark Mode",
+      "options" : {
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:LongScreenshot.xcodeproj",
+          "identifier" : "A1B2C3CF0000000000000000",
+          "name" : "LongScreenshot"
+        },
+        "testExecutionOrdering" : "random",
+        "userInfo" : {
+          "UITestAppearance" : "dark"
+        }
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:LongScreenshot.xcodeproj",
+          "identifier" : "A1B2C3CF0000000000000000",
+          "name" : "LongScreenshot"
+        }
+      ]
+    },
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:LongScreenshot.xcodeproj",
+      "identifier" : "A1B2C3CF0000000000000000",
+      "name" : "LongScreenshot"
+    },
+    "testRepetitionMode" : "none",
+    "testTimeouts" : {
+      "testExecution" : 300
+    },
+    "uiTestingScreenshots" : {
+      "lifetime" : "keepAlways"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:LongScreenshot.xcodeproj",
+        "identifier" : "LongScreenshotUITests",
+        "name" : "LongScreenshotUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

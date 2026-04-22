@@ -1,0 +1,98 @@
+# Xcode
+## User settings
+*.xcuserstate
+*.xcuserdatad
+*.xcworkspace
+xcuserdata/
+
+## various build results
+*.o
+*.LinkFileList
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# CocoaPods
+## We do not recommend to add the Pods directory to your .gitignore. However
+## you should judge for yourself. The potential benefit is
+## that CocoaPods can install tooling that you may want.
+#Pods/
+
+# CocoaPods
+Pods/
+*.xcworkspace
+
+# Swift Package Manager
+## Swift Package Manager
+.build/
+Packages/
+.swiftpm/
+
+# Add this line if you want to avoid checking in source files from Swift Package Manager,
+# and the dependency directories.
+# Package.resolved
+
+# Xcode
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+*.xcuserdatad
+**/.xcode/
+
+# Archives
+*.zip
+*.tar
+
+# App Store
+*.entitlements
+*.plist
+
+# IDE
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+~*
+
+# Ruby
+Gemfile.lock
+vendor/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+env/
+.venv/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock

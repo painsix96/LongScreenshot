@@ -1,0 +1,769 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D10100000000000000000001 /* LongScreenshotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000001 /* LongScreenshotApp.swift */; };
+		D10100000000000000000002 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000002 /* Assets.xcassets */; };
+		D10100000000000000000003 /* ScreenshotImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000003 /* ScreenshotImage.swift */; };
+		D10100000000000000000004 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000004 /* Annotation.swift */; };
+		D10100000000000000000005 /* ArrowAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000005 /* ArrowAnnotation.swift */; };
+		D10100000000000000000006 /* BrushStroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000006 /* BrushStroke.swift */; };
+		D10100000000000000000007 /* MosaicAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000007 /* MosaicAnnotation.swift */; };
+		D10100000000000000000008 /* RectangleAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000008 /* RectangleAnnotation.swift */; };
+		D10100000000000000000009 /* TextAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000009 /* TextAnnotation.swift */; };
+		D1010000000000000000000A /* AnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000A /* AnnotationView.swift */; };
+		D1010000000000000000000B /* AnnotationToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000B /* AnnotationToolBar.swift */; };
+		D1010000000000000000000C /* DrawingCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000C /* DrawingCanvas.swift */; };
+		D1010000000000000000000D /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000D /* LoadingView.swift */; };
+		D1010000000000000000000E /* InfoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000E /* InfoRow.swift */; };
+		D10100000000000000000086 /* NoBounceScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000086 /* NoBounceScrollView.swift */; };
+		D1010000000000000000000F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000F /* ContentView.swift */; };
+		D10100000000000000000010 /* CropOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000010 /* CropOverlayView.swift */; };
+		D10100000000000000000011 /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000011 /* CropView.swift */; };
+		D10100000000000000000012 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000012 /* ExportView.swift */; };
+		D10100000000000000000014 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000014 /* HomeView.swift */; };
+		D10100000000000000000015 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000015 /* ImagePicker.swift */; };
+		D10100000000000000000016 /* ManualAdjustmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000016 /* ManualAdjustmentView.swift */; };
+		D10100000000000000000017 /* PhotoPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000017 /* PhotoPickerView.swift */; };
+		D10100000000000000000018 /* PreviewCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000018 /* PreviewCanvas.swift */; };
+		D10100000000000000000019 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000019 /* SettingsView.swift */; };
+		D1010000000000000000001A /* StitchingLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000001A /* StitchingLineView.swift */; };
+		D1010000000000000000001B /* AnnotationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000001B /* AnnotationViewModel.swift */; };
+		D1010000000000000000001C /* ContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000001C /* ContentViewModel.swift */; };
+		D1010000000000000000001D /* CropViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000001D /* CropViewModel.swift */; };
+		D1010000000000000000001F /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000001F /* PersistenceController.swift */; };
+		D10100000000000000000021 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000021 /* ExportService.swift */; };
+		D10100000000000000000022 /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000022 /* ImageProcessor.swift */; };
+		D10100000000000000000023 /* ImageSimilarity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000023 /* ImageSimilarity.swift */; };
+		D10100000000000000000024 /* ImageStitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000024 /* ImageStitcher.swift */; };
+		D10100000000000000000025 /* ImageStitchingAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000025 /* ImageStitchingAlgorithm.swift */; };
+		D10100000000000000000073 /* NCCStitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000076 /* NCCStitcher.swift */; };
+		D10100000000000000000026 /* OverlapDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000026 /* OverlapDetector.swift */; };
+		D10100000000000000000027 /* StitchingProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000027 /* StitchingProgress.swift */; };
+		D10100000000000000000028 /* AnimationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000028 /* AnimationHelper.swift */; };
+		D10100000000000000000082 /* FixedRegionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000082 /* FixedRegionDetector.swift */; };
+		D10100000000000000000083 /* VerticalOffsetMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000083 /* VerticalOffsetMatcher.swift */; };
+		D10100000000000000000084 /* LongScreenshotCompositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000084 /* LongScreenshotCompositor.swift */; };
+		D10100000000000000000085 /* LongScreenshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000085 /* LongScreenshotBuilder.swift */; };
+		D10100000000000000000029 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000029 /* HapticManager.swift */; };
+		D1010000000000000000002A /* PhotoLibraryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000002A /* PhotoLibraryHelper.swift */; };
+		D1010000000000000000002B /* TransitionEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000002B /* TransitionEffects.swift */; };
+		D1010000000000000000002C /* LongScreenshot.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000002D /* LongScreenshot.xcdatamodeld */; };
+		D10100000000000000000070 /* TestImageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000070 /* TestImageFactory.swift */; };
+		D10100000000000000000071 /* NCCStitcherCropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000071 /* NCCStitcherCropTests.swift */; };
+		D10100000000000000000080 /* NCCStitcherCropEnhancedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */; };
+		D10100000000000000000081 /* NCCStitcherRobustnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */; };
+
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D10000000000000000000001 /* LongScreenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LongScreenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D10200000000000000000001 /* LongScreenshotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotApp.swift; sourceTree = "<group>"; };
+		D10200000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D10200000000000000000003 /* ScreenshotImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotImage.swift; sourceTree = "<group>"; };
+		D10200000000000000000004 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
+		D10200000000000000000005 /* ArrowAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowAnnotation.swift; sourceTree = "<group>"; };
+		D10200000000000000000006 /* BrushStroke.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushStroke.swift; sourceTree = "<group>"; };
+		D10200000000000000000007 /* MosaicAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MosaicAnnotation.swift; sourceTree = "<group>"; };
+		D10200000000000000000008 /* RectangleAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleAnnotation.swift; sourceTree = "<group>"; };
+		D10200000000000000000009 /* TextAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAnnotation.swift; sourceTree = "<group>"; };
+		D1020000000000000000000A /* AnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationView.swift; sourceTree = "<group>"; };
+		D1020000000000000000000B /* AnnotationToolBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationToolBar.swift; sourceTree = "<group>"; };
+		D1020000000000000000000C /* DrawingCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingCanvas.swift; sourceTree = "<group>"; };
+		D1020000000000000000000D /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		D1020000000000000000000E /* InfoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoRow.swift; sourceTree = "<group>"; };
+		D10200000000000000000086 /* NoBounceScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoBounceScrollView.swift; sourceTree = "<group>"; };
+		D1020000000000000000000F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D10200000000000000000010 /* CropOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropOverlayView.swift; sourceTree = "<group>"; };
+		D10200000000000000000011 /* CropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
+		D10200000000000000000012 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		D10200000000000000000014 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		D10200000000000000000015 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		D10200000000000000000016 /* ManualAdjustmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualAdjustmentView.swift; sourceTree = "<group>"; };
+		D10200000000000000000017 /* PhotoPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerView.swift; sourceTree = "<group>"; };
+		D10200000000000000000018 /* PreviewCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewCanvas.swift; sourceTree = "<group>"; };
+		D10200000000000000000019 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		D1020000000000000000001A /* StitchingLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StitchingLineView.swift; sourceTree = "<group>"; };
+		D1020000000000000000001B /* AnnotationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationViewModel.swift; sourceTree = "<group>"; };
+		D1020000000000000000001C /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
+		D1020000000000000000001D /* CropViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropViewModel.swift; sourceTree = "<group>"; };
+		D1020000000000000000001F /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		D10200000000000000000021 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
+		D10200000000000000000022 /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
+		D10200000000000000000023 /* ImageSimilarity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSimilarity.swift; sourceTree = "<group>"; };
+		D10200000000000000000024 /* ImageStitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStitcher.swift; sourceTree = "<group>"; };
+		D10200000000000000000025 /* ImageStitchingAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStitchingAlgorithm.swift; sourceTree = "<group>"; };
+		D10200000000000000000026 /* OverlapDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapDetector.swift; sourceTree = "<group>"; };
+		D10200000000000000000027 /* StitchingProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StitchingProgress.swift; sourceTree = "<group>"; };
+		D10200000000000000000028 /* AnimationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationHelper.swift; sourceTree = "<group>"; };
+		D10200000000000000000082 /* FixedRegionDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedRegionDetector.swift; sourceTree = "<group>"; };
+		D10200000000000000000083 /* VerticalOffsetMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalOffsetMatcher.swift; sourceTree = "<group>"; };
+		D10200000000000000000084 /* LongScreenshotCompositor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotCompositor.swift; sourceTree = "<group>"; };
+		D10200000000000000000085 /* LongScreenshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotBuilder.swift; sourceTree = "<group>"; };
+		D10200000000000000000029 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		D1020000000000000000002A /* PhotoLibraryHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryHelper.swift; sourceTree = "<group>"; };
+		D1020000000000000000002B /* TransitionEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionEffects.swift; sourceTree = "<group>"; };
+		D1020000000000000000002E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D1020000000000000000002D /* LongScreenshot.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LongScreenshot.xcdatamodeld; sourceTree = "<group>"; };
+		D10000000000000000000071 /* LongScreenshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LongScreenshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D10200000000000000000070 /* TestImageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestImageFactory.swift; sourceTree = "<group>"; };
+		D10200000000000000000071 /* NCCStitcherCropTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherCropTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherCropEnhancedTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherRobustnessTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000072 /* ImageStitcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStitcherTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000073 /* OverlapDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapDetectorTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000074 /* ImageSimilarityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSimilarityTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000075 /* CoreDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000076 /* NCCStitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcher.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D10000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D10000000000000000000073 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D10000000000000000000003 = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000004 /* LongScreenshot */,
+				D10000000000000000000005 /* Products */,
+				D10000000000000000000078 /* LongScreenshotTests */,
+			);
+			sourceTree = "<group>";
+		};
+		D10000000000000000000004 /* LongScreenshot */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000001 /* LongScreenshotApp.swift */,
+				D10300000000000000000001 /* Models */,
+				D10300000000000000000002 /* Views */,
+				D10300000000000000000003 /* ViewModels */,
+				D10300000000000000000004 /* Services */,
+				D10300000000000000000005 /* Utils */,
+				D10300000000000000000006 /* DataModels */,
+				D10200000000000000000002 /* Assets.xcassets */,
+				D1020000000000000000002E /* Info.plist */,
+			);
+			path = LongScreenshot;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000001 /* LongScreenshot.app */,
+				D10000000000000000000071 /* LongScreenshotTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000003 /* ScreenshotImage.swift */,
+				D10300000000000000000007 /* Annotation */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000002 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D1020000000000000000000F /* ContentView.swift */,
+				D10200000000000000000014 /* HomeView.swift */,
+				D10200000000000000000019 /* SettingsView.swift */,
+				D10200000000000000000015 /* ImagePicker.swift */,
+				D10200000000000000000017 /* PhotoPickerView.swift */,
+				D10200000000000000000016 /* ManualAdjustmentView.swift */,
+				D10200000000000000000018 /* PreviewCanvas.swift */,
+				D1020000000000000000001A /* StitchingLineView.swift */,
+				D10200000000000000000011 /* CropView.swift */,
+				D10200000000000000000010 /* CropOverlayView.swift */,
+				D10200000000000000000012 /* ExportView.swift */,
+				D10300000000000000000008 /* Annotation */,
+				D10300000000000000000009 /* Components */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000003 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				D1020000000000000000001C /* ContentViewModel.swift */,
+				D1020000000000000000001D /* CropViewModel.swift */,
+				D1030000000000000000000A /* Annotation */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000024 /* ImageStitcher.swift */,
+				D10200000000000000000023 /* ImageSimilarity.swift */,
+				D10200000000000000000026 /* OverlapDetector.swift */,
+				D10200000000000000000025 /* ImageStitchingAlgorithm.swift */,
+				D10200000000000000000022 /* ImageProcessor.swift */,
+				D10200000000000000000027 /* StitchingProgress.swift */,
+				D10200000000000000000021 /* ExportService.swift */,
+				D10200000000000000000076 /* NCCStitcher.swift */,
+				D10200000000000000000082 /* FixedRegionDetector.swift */,
+				D10200000000000000000083 /* VerticalOffsetMatcher.swift */,
+				D10200000000000000000084 /* LongScreenshotCompositor.swift */,
+				D10200000000000000000085 /* LongScreenshotBuilder.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000005 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				D1020000000000000000002A /* PhotoLibraryHelper.swift */,
+				D10200000000000000000028 /* AnimationHelper.swift */,
+				D10200000000000000000029 /* HapticManager.swift */,
+				D1020000000000000000002B /* TransitionEffects.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000006 /* DataModels */ = {
+			isa = PBXGroup;
+			children = (
+				D1020000000000000000002D /* LongScreenshot.xcdatamodeld */,
+				D1020000000000000000001F /* PersistenceController.swift */,
+			);
+			path = DataModels;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000007 /* Annotation */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000004 /* Annotation.swift */,
+				D10200000000000000000006 /* BrushStroke.swift */,
+				D10200000000000000000005 /* ArrowAnnotation.swift */,
+				D10200000000000000000008 /* RectangleAnnotation.swift */,
+				D10200000000000000000009 /* TextAnnotation.swift */,
+				D10200000000000000000007 /* MosaicAnnotation.swift */,
+			);
+			path = Annotation;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000008 /* Annotation */ = {
+			isa = PBXGroup;
+			children = (
+				D1020000000000000000000A /* AnnotationView.swift */,
+				D1020000000000000000000C /* DrawingCanvas.swift */,
+				D1020000000000000000000B /* AnnotationToolBar.swift */,
+			);
+			path = Annotation;
+			sourceTree = "<group>";
+		};
+		D10300000000000000000009 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				D1020000000000000000000D /* LoadingView.swift */,
+				D1020000000000000000000E /* InfoRow.swift */,
+				D10200000000000000000086 /* NoBounceScrollView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		D1030000000000000000000A /* Annotation */ = {
+			isa = PBXGroup;
+			children = (
+				D1020000000000000000001B /* AnnotationViewModel.swift */,
+			);
+			path = Annotation;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000078 /* LongScreenshotTests */ = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000079 /* ServicesTests */,
+				D1000000000000000000007A /* Utils */,
+				D1000000000000000000007B /* ModelsTests */,
+			);
+			path = LongScreenshotTests;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000079 /* ServicesTests */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000071 /* NCCStitcherCropTests.swift */,
+				D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */,
+				D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */,
+				D10200000000000000000072 /* ImageStitcherTests.swift */,
+				D10200000000000000000073 /* OverlapDetectorTests.swift */,
+				D10200000000000000000074 /* ImageSimilarityTests.swift */,
+			);
+			path = ServicesTests;
+			sourceTree = "<group>";
+		};
+		D1000000000000000000007A /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000070 /* TestImageFactory.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		D1000000000000000000007B /* ModelsTests */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000075 /* CoreDataTests.swift */,
+			);
+			path = ModelsTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D10000000000000000000006 /* LongScreenshot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D10000000000000000000007 /* Build configuration list for PBXNativeTarget "LongScreenshot" */;
+			buildPhases = (
+				D10000000000000000000008 /* Sources */,
+				D10000000000000000000002 /* Frameworks */,
+				D10000000000000000000009 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LongScreenshot;
+			productName = LongScreenshot;
+			productReference = D10000000000000000000001 /* LongScreenshot.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D10000000000000000000070 /* LongScreenshotTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D10000000000000000000075 /* Build configuration list for PBXNativeTarget "LongScreenshotTests" */;
+			buildPhases = (
+				D10000000000000000000072 /* Sources */,
+				D10000000000000000000073 /* Frameworks */,
+				D10000000000000000000074 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D10000000000000000000061 /* PBXTargetDependency */,
+			);
+			name = LongScreenshotTests;
+			productName = LongScreenshotTests;
+			productReference = D10000000000000000000071 /* LongScreenshotTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D1000000000000000000000A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					D10000000000000000000006 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					D10000000000000000000070 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = D10000000000000000000006;
+					};
+				};
+			};
+			buildConfigurationList = D1000000000000000000000B /* Build configuration list for PBXProject "LongScreenshot" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D10000000000000000000003;
+			productRefGroup = D10000000000000000000005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D10000000000000000000006 /* LongScreenshot */,
+				D10000000000000000000070 /* LongScreenshotTests */,
+			);
+		};
+/* End PBXProject section */
+
+
+/* Begin PBXContainerItemProxy section */
+		D10000000000000000000060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D1000000000000000000000A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D10000000000000000000006;
+			remoteInfo = LongScreenshot;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		D10000000000000000000061 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D10000000000000000000006 /* LongScreenshot */;
+			targetProxy = D10000000000000000000060 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+/* Begin PBXResourcesBuildPhase section */
+		D10000000000000000000009 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D10100000000000000000002 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D10000000000000000000074 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D10000000000000000000008 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D10100000000000000000001 /* LongScreenshotApp.swift in Sources */,
+				D10100000000000000000003 /* ScreenshotImage.swift in Sources */,
+				D10100000000000000000004 /* Annotation.swift in Sources */,
+				D10100000000000000000005 /* ArrowAnnotation.swift in Sources */,
+				D10100000000000000000006 /* BrushStroke.swift in Sources */,
+				D10100000000000000000007 /* MosaicAnnotation.swift in Sources */,
+				D10100000000000000000008 /* RectangleAnnotation.swift in Sources */,
+				D10100000000000000000009 /* TextAnnotation.swift in Sources */,
+				D1010000000000000000000A /* AnnotationView.swift in Sources */,
+				D1010000000000000000000B /* AnnotationToolBar.swift in Sources */,
+				D1010000000000000000000C /* DrawingCanvas.swift in Sources */,
+				D1010000000000000000000D /* LoadingView.swift in Sources */,
+				D1010000000000000000000E /* InfoRow.swift in Sources */,
+				D10100000000000000000086 /* NoBounceScrollView.swift in Sources */,
+				D1010000000000000000000F /* ContentView.swift in Sources */,
+				D10100000000000000000010 /* CropOverlayView.swift in Sources */,
+				D10100000000000000000011 /* CropView.swift in Sources */,
+				D10100000000000000000012 /* ExportView.swift in Sources */,
+				D10100000000000000000014 /* HomeView.swift in Sources */,
+				D10100000000000000000015 /* ImagePicker.swift in Sources */,
+				D10100000000000000000016 /* ManualAdjustmentView.swift in Sources */,
+				D10100000000000000000017 /* PhotoPickerView.swift in Sources */,
+				D10100000000000000000018 /* PreviewCanvas.swift in Sources */,
+				D10100000000000000000019 /* SettingsView.swift in Sources */,
+				D1010000000000000000001A /* StitchingLineView.swift in Sources */,
+				D1010000000000000000001B /* AnnotationViewModel.swift in Sources */,
+				D1010000000000000000001C /* ContentViewModel.swift in Sources */,
+				D1010000000000000000001D /* CropViewModel.swift in Sources */,
+				D1010000000000000000001F /* PersistenceController.swift in Sources */,
+				D10100000000000000000021 /* ExportService.swift in Sources */,
+				D10100000000000000000022 /* ImageProcessor.swift in Sources */,
+				D10100000000000000000023 /* ImageSimilarity.swift in Sources */,
+				D10100000000000000000024 /* ImageStitcher.swift in Sources */,
+				D10100000000000000000025 /* ImageStitchingAlgorithm.swift in Sources */,
+				D10100000000000000000073 /* NCCStitcher.swift in Sources */,
+				D10100000000000000000026 /* OverlapDetector.swift in Sources */,
+				D10100000000000000000027 /* StitchingProgress.swift in Sources */,
+				D10100000000000000000082 /* FixedRegionDetector.swift in Sources */,
+				D10100000000000000000083 /* VerticalOffsetMatcher.swift in Sources */,
+				D10100000000000000000084 /* LongScreenshotCompositor.swift in Sources */,
+				D10100000000000000000085 /* LongScreenshotBuilder.swift in Sources */,
+				D10100000000000000000028 /* AnimationHelper.swift in Sources */,
+				D10100000000000000000029 /* HapticManager.swift in Sources */,
+				D1010000000000000000002A /* PhotoLibraryHelper.swift in Sources */,
+				D1010000000000000000002B /* TransitionEffects.swift in Sources */,
+				D1010000000000000000002C /* LongScreenshot.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D10000000000000000000072 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D10100000000000000000070 /* TestImageFactory.swift in Sources */,
+				D10100000000000000000071 /* NCCStitcherCropTests.swift in Sources */,
+				D10100000000000000000080 /* NCCStitcherCropEnhancedTests.swift in Sources */,
+				D10100000000000000000081 /* NCCStitcherRobustnessTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D1000000000000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORKS = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D1000000000000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORKS = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D1000000000000000000000E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LongScreenshot/Preview Content\"";
+				DEVELOPMENT_TEAM = U6JW8977CR;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LongScreenshot/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenhanzhong.longscreenshot;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D1000000000000000000000F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LongScreenshot/Preview Content\"";
+				DEVELOPMENT_TEAM = U6JW8977CR;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LongScreenshot/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.longscreenshot.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D10000000000000000000076 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U6JW8977CR;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenhanzhong.longscreenshot.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LongScreenshot.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LongScreenshot";
+			};
+			name = Debug;
+		};
+		D10000000000000000000077 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U6JW8977CR;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chenhanzhong.longscreenshot.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LongScreenshot.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LongScreenshot";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D10000000000000000000007 /* Build configuration list for PBXNativeTarget "LongScreenshot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1000000000000000000000E /* Debug */,
+				D1000000000000000000000F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1000000000000000000000B /* Build configuration list for PBXProject "LongScreenshot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1000000000000000000000C /* Debug */,
+				D1000000000000000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D10000000000000000000075 /* Build configuration list for PBXNativeTarget "LongScreenshotTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D10000000000000000000076 /* Debug */,
+				D10000000000000000000077 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D1000000000000000000000A /* Project object */;
+}
