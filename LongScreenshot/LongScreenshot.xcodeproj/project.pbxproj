@@ -21,7 +21,6 @@
 		D1010000000000000000000C /* DrawingCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000C /* DrawingCanvas.swift */; };
 		D1010000000000000000000D /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000D /* LoadingView.swift */; };
 		D1010000000000000000000E /* InfoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000E /* InfoRow.swift */; };
-		D10100000000000000000086 /* NoBounceScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000086 /* NoBounceScrollView.swift */; };
 		D1010000000000000000000F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000000F /* ContentView.swift */; };
 		D10100000000000000000010 /* CropOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000010 /* CropOverlayView.swift */; };
 		D10100000000000000000011 /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000011 /* CropView.swift */; };
@@ -42,27 +41,38 @@
 		D10100000000000000000023 /* ImageSimilarity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000023 /* ImageSimilarity.swift */; };
 		D10100000000000000000024 /* ImageStitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000024 /* ImageStitcher.swift */; };
 		D10100000000000000000025 /* ImageStitchingAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000025 /* ImageStitchingAlgorithm.swift */; };
-		D10100000000000000000073 /* NCCStitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000076 /* NCCStitcher.swift */; };
 		D10100000000000000000026 /* OverlapDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000026 /* OverlapDetector.swift */; };
 		D10100000000000000000027 /* StitchingProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000027 /* StitchingProgress.swift */; };
 		D10100000000000000000028 /* AnimationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000028 /* AnimationHelper.swift */; };
-		D10100000000000000000082 /* FixedRegionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000082 /* FixedRegionDetector.swift */; };
-		D10100000000000000000083 /* VerticalOffsetMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000083 /* VerticalOffsetMatcher.swift */; };
-		D10100000000000000000084 /* LongScreenshotCompositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000084 /* LongScreenshotCompositor.swift */; };
-		D10100000000000000000085 /* LongScreenshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000085 /* LongScreenshotBuilder.swift */; };
 		D10100000000000000000029 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000029 /* HapticManager.swift */; };
 		D1010000000000000000002A /* PhotoLibraryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000002A /* PhotoLibraryHelper.swift */; };
 		D1010000000000000000002B /* TransitionEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000002B /* TransitionEffects.swift */; };
 		D1010000000000000000002C /* LongScreenshot.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000002D /* LongScreenshot.xcdatamodeld */; };
 		D10100000000000000000070 /* TestImageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000070 /* TestImageFactory.swift */; };
 		D10100000000000000000071 /* NCCStitcherCropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000071 /* NCCStitcherCropTests.swift */; };
+		D10100000000000000000073 /* NCCStitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000076 /* NCCStitcher.swift */; };
 		D10100000000000000000080 /* NCCStitcherCropEnhancedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */; };
 		D10100000000000000000081 /* NCCStitcherRobustnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */; };
-
+		D10100000000000000000082 /* FixedRegionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000082 /* FixedRegionDetector.swift */; };
+		D10100000000000000000083 /* VerticalOffsetMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000083 /* VerticalOffsetMatcher.swift */; };
+		D10100000000000000000084 /* LongScreenshotCompositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000084 /* LongScreenshotCompositor.swift */; };
+		D10100000000000000000085 /* LongScreenshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000085 /* LongScreenshotBuilder.swift */; };
+		D10100000000000000000086 /* NoBounceScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000086 /* NoBounceScrollView.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D10000000000000000000060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D1000000000000000000000A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D10000000000000000000006;
+			remoteInfo = LongScreenshot;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		D10000000000000000000001 /* LongScreenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LongScreenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D10000000000000000000071 /* LongScreenshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LongScreenshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D10200000000000000000001 /* LongScreenshotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotApp.swift; sourceTree = "<group>"; };
 		D10200000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D10200000000000000000003 /* ScreenshotImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotImage.swift; sourceTree = "<group>"; };
@@ -77,7 +87,6 @@
 		D1020000000000000000000C /* DrawingCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingCanvas.swift; sourceTree = "<group>"; };
 		D1020000000000000000000D /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		D1020000000000000000000E /* InfoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoRow.swift; sourceTree = "<group>"; };
-		D10200000000000000000086 /* NoBounceScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoBounceScrollView.swift; sourceTree = "<group>"; };
 		D1020000000000000000000F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D10200000000000000000010 /* CropOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropOverlayView.swift; sourceTree = "<group>"; };
 		D10200000000000000000011 /* CropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
@@ -101,25 +110,25 @@
 		D10200000000000000000026 /* OverlapDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapDetector.swift; sourceTree = "<group>"; };
 		D10200000000000000000027 /* StitchingProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StitchingProgress.swift; sourceTree = "<group>"; };
 		D10200000000000000000028 /* AnimationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationHelper.swift; sourceTree = "<group>"; };
-		D10200000000000000000082 /* FixedRegionDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedRegionDetector.swift; sourceTree = "<group>"; };
-		D10200000000000000000083 /* VerticalOffsetMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalOffsetMatcher.swift; sourceTree = "<group>"; };
-		D10200000000000000000084 /* LongScreenshotCompositor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotCompositor.swift; sourceTree = "<group>"; };
-		D10200000000000000000085 /* LongScreenshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotBuilder.swift; sourceTree = "<group>"; };
 		D10200000000000000000029 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D1020000000000000000002A /* PhotoLibraryHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryHelper.swift; sourceTree = "<group>"; };
 		D1020000000000000000002B /* TransitionEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionEffects.swift; sourceTree = "<group>"; };
-		D1020000000000000000002E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1020000000000000000002D /* LongScreenshot.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LongScreenshot.xcdatamodeld; sourceTree = "<group>"; };
-		D10000000000000000000071 /* LongScreenshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LongScreenshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1020000000000000000002E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D10200000000000000000070 /* TestImageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestImageFactory.swift; sourceTree = "<group>"; };
 		D10200000000000000000071 /* NCCStitcherCropTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherCropTests.swift; sourceTree = "<group>"; };
-		D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherCropEnhancedTests.swift; sourceTree = "<group>"; };
-		D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherRobustnessTests.swift; sourceTree = "<group>"; };
 		D10200000000000000000072 /* ImageStitcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStitcherTests.swift; sourceTree = "<group>"; };
 		D10200000000000000000073 /* OverlapDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapDetectorTests.swift; sourceTree = "<group>"; };
 		D10200000000000000000074 /* ImageSimilarityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSimilarityTests.swift; sourceTree = "<group>"; };
 		D10200000000000000000075 /* CoreDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataTests.swift; sourceTree = "<group>"; };
 		D10200000000000000000076 /* NCCStitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcher.swift; sourceTree = "<group>"; };
+		D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherCropEnhancedTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCStitcherRobustnessTests.swift; sourceTree = "<group>"; };
+		D10200000000000000000082 /* FixedRegionDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedRegionDetector.swift; sourceTree = "<group>"; };
+		D10200000000000000000083 /* VerticalOffsetMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalOffsetMatcher.swift; sourceTree = "<group>"; };
+		D10200000000000000000084 /* LongScreenshotCompositor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotCompositor.swift; sourceTree = "<group>"; };
+		D10200000000000000000085 /* LongScreenshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongScreenshotBuilder.swift; sourceTree = "<group>"; };
+		D10200000000000000000086 /* NoBounceScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoBounceScrollView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +181,45 @@
 				D10000000000000000000071 /* LongScreenshotTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000078 /* LongScreenshotTests */ = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000079 /* ServicesTests */,
+				D1000000000000000000007A /* Utils */,
+				D1000000000000000000007B /* ModelsTests */,
+			);
+			path = LongScreenshotTests;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000079 /* ServicesTests */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000071 /* NCCStitcherCropTests.swift */,
+				D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */,
+				D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */,
+				D10200000000000000000072 /* ImageStitcherTests.swift */,
+				D10200000000000000000073 /* OverlapDetectorTests.swift */,
+				D10200000000000000000074 /* ImageSimilarityTests.swift */,
+			);
+			path = ServicesTests;
+			sourceTree = "<group>";
+		};
+		D1000000000000000000007A /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000070 /* TestImageFactory.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		D1000000000000000000007B /* ModelsTests */ = {
+			isa = PBXGroup;
+			children = (
+				D10200000000000000000075 /* CoreDataTests.swift */,
+			);
+			path = ModelsTests;
 			sourceTree = "<group>";
 		};
 		D10300000000000000000001 /* Models */ = {
@@ -293,45 +341,6 @@
 			path = Annotation;
 			sourceTree = "<group>";
 		};
-		D10000000000000000000078 /* LongScreenshotTests */ = {
-			isa = PBXGroup;
-			children = (
-				D10000000000000000000079 /* ServicesTests */,
-				D1000000000000000000007A /* Utils */,
-				D1000000000000000000007B /* ModelsTests */,
-			);
-			path = LongScreenshotTests;
-			sourceTree = "<group>";
-		};
-		D10000000000000000000079 /* ServicesTests */ = {
-			isa = PBXGroup;
-			children = (
-				D10200000000000000000071 /* NCCStitcherCropTests.swift */,
-				D10200000000000000000080 /* NCCStitcherCropEnhancedTests.swift */,
-				D10200000000000000000081 /* NCCStitcherRobustnessTests.swift */,
-				D10200000000000000000072 /* ImageStitcherTests.swift */,
-				D10200000000000000000073 /* OverlapDetectorTests.swift */,
-				D10200000000000000000074 /* ImageSimilarityTests.swift */,
-			);
-			path = ServicesTests;
-			sourceTree = "<group>";
-		};
-		D1000000000000000000007A /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				D10200000000000000000070 /* TestImageFactory.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		D1000000000000000000007B /* ModelsTests */ = {
-			isa = PBXGroup;
-			children = (
-				D10200000000000000000075 /* CoreDataTests.swift */,
-			);
-			path = ModelsTests;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -408,24 +417,6 @@
 		};
 /* End PBXProject section */
 
-
-/* Begin PBXContainerItemProxy section */
-		D10000000000000000000060 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D1000000000000000000000A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D10000000000000000000006;
-			remoteInfo = LongScreenshot;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXTargetDependency section */
-		D10000000000000000000061 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D10000000000000000000006 /* LongScreenshot */;
-			targetProxy = D10000000000000000000060 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 /* Begin PBXResourcesBuildPhase section */
 		D10000000000000000000009 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -510,6 +501,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D10000000000000000000061 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D10000000000000000000006 /* LongScreenshot */;
+			targetProxy = D10000000000000000000060 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D1000000000000000000000C /* Debug */ = {
