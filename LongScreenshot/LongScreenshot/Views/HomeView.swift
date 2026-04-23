@@ -748,22 +748,18 @@ class StitchingViewModel: ObservableObject {
             }
         }
         
-        // 步骤 1：视频转帧
+        // 步骤 1：使用新的视频生成长截图算法
         let converter = VideoToFramesConverter()
-        let frames = try await converter.convertToFrames(from: asset, progress: progress)
+        guard let result = await converter.generateLongScreenshot(from: asset, progress: progress) else {
+            throw StitchingError.custom("视频生成长截图失败")
+        }
         
         progressTask.cancel()
         
-        await MainActor.run {
-            self.progress = 0.3
-            self.statusText = "检测重叠区域..."
-        }
-        
-        // 步骤 2：复用现有的照片拼接逻辑
-        let result = try await performStitching(images: frames)
-        
         return result
     }
+    
+
 
     // MARK: - 图片处理（原有逻辑）
 
