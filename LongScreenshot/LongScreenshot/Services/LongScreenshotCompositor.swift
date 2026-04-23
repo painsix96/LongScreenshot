@@ -254,22 +254,31 @@ struct LongScreenshotCompositor {
                 }
             }
 
-            // 绘制底部固定区域（第一帧的底部）
+            // 绘制底部固定区域（最后一帧的底部）
             if bottomHeight > 0 {
-                let bottomRect = CGRect(
-                    x: 0,
-                    y: fullHeight - bottomHeight,
-                    width: fullWidth,
-                    height: bottomHeight
-                )
-                if let bottomFixed = firstCG.cropping(to: bottomRect) {
+                // 使用最后一帧的底部固定区域，因为它包含最新的内容
+                let lastFrame = frames.last
+                if let lastCG = lastFrame?.cgImage {
+                    let bottomRect = CGRect(
+                        x: 0,
+                        y: fullHeight - bottomHeight,
+                        width: fullWidth,
+                        height: bottomHeight
+                    )
+                    if let bottomFixed = lastCG.cropping(to: bottomRect) {
+                        let bottomUIImage = UIImage(cgImage: bottomFixed, scale: CGFloat(scale), orientation: .up)
+                        bottomUIImage.draw(in: CGRect(x: 0, y: currentY, width: fullWidth, height: bottomHeight))
+                        logger.debug("✅ 绘制底部固定区域: \(bottomHeight)px, y=\(currentY), finalHeight=\(finalHeight) (使用最后一帧)")
+                    }
+                } else if let bottomFixed = firstCG.cropping(to: CGRect(x: 0, y: fullHeight - bottomHeight, width: fullWidth, height: bottomHeight)) {
+                    // 回退到第一帧
                     let bottomUIImage = UIImage(cgImage: bottomFixed, scale: CGFloat(scale), orientation: .up)
                     bottomUIImage.draw(in: CGRect(x: 0, y: currentY, width: fullWidth, height: bottomHeight))
-                    logger.debug("✅ 绘制底部固定区域: \(bottomHeight)px, y=\(currentY), finalHeight=\(finalHeight)")
+                    logger.debug("✅ 绘制底部固定区域: \(bottomHeight)px, y=\(currentY), finalHeight=\(finalHeight) (使用第一帧)")
                 }
             }
         }
-
+        
         logger.info("✅ 长图合成完成: \(finalImage.size.width)×\(finalImage.size.height) (scale=\(scale))")
         return finalImage
     }

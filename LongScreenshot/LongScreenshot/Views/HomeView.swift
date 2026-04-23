@@ -136,10 +136,11 @@ struct HomeView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             let fetchOptions = PHFetchOptions()
             fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-            // 只加载照片（截图通常是照片）
+            // 加载照片和视频
             fetchOptions.predicate = NSPredicate(
-                format: "mediaType == %d",
-                PHAssetMediaType.image.rawValue
+                format: "mediaType == %d OR mediaType == %d",
+                PHAssetMediaType.image.rawValue,
+                PHAssetMediaType.video.rawValue
             )
 
             let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
@@ -205,7 +206,7 @@ struct BottomActionBar: View {
     var body: some View {
         HStack(spacing: 16) {
             // 已选择数量
-            Text("已选择 \(selectedCount) 张")
+            Text("已选择 \(selectedCount) 项")
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(.primary)
 
@@ -256,40 +257,50 @@ struct PhotoGridView: View {
     var body: some View {
         ScrollViewReader {
             scrollView in
-            ScrollView(showsIndicators: false) {
-                if isLoading {
-                    LoadingPlaceholder()
-                        .padding(.top, 100)
-                } else if photoAssets.isEmpty {
-                    EmptyPhotoView()
-                        .padding(.top, 100)
-                } else {
-                    LazyVGrid(columns: columns, spacing: 0) {
-                        ForEach(photoAssets, id: \.localIdentifier) { asset in
-                            PhotoCell(
-                                asset: asset,
-                                selectedPhotos: $selectedPhotos
-                            )
-                            .id(asset.localIdentifier)
+            ZStack {
+                ScrollView(showsIndicators: false) {
+                    if photoAssets.isEmpty {
+                        EmptyPhotoView()
+                            .padding(.top, 100)
+                    } else {
+                        LazyVGrid(columns: columns, spacing: 0) {
+                            ForEach(photoAssets, id: \.localIdentifier) { asset in
+                                PhotoCell(
+                                    asset: asset,
+                                    selectedPhotos: $selectedPhotos
+                                )
+                                .id(asset.localIdentifier)
+                            }
                         }
+                        
+                        // 底部预留空间，高度与底部操作栏一致
+                VStack(spacing: 0) {
+                    Spacer()
+                    Text("共 \(photoAssets.count) 项")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
+                        .padding(.bottom, 10)
+                }
+                .frame(height: 60)
+                .id("bottom-reserved-space")
                     }
-                    
-                    // 底部预留空间，高度与底部操作栏一致
-                    VStack(spacing: 0) {
-                        Spacer()
-                        Text("共 \(photoAssets.count) 张照片")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.secondary)
-                            .padding(.bottom, 10)
-                    }
-                    .frame(height: 60)
-                    .id("bottom-reserved-space")
+                }
+                
+                // 加载指示器 - 叠加在现有内容上，保持ScrollView结构稳定
+                if isLoading {
+                    Color(.systemBackground)
+                        .ignoresSafeArea()
+                        .overlay {
+                            LoadingPlaceholder()
+                                .padding(.top, 100)
+                        }
                 }
             }
             .onChange(of: photoAssets) {
                 newValue in
                 if !newValue.isEmpty {
-                    DispatchQueue.main.async {
+                    // 延迟滚动，确保视图完全更新
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         scrollView.scrollTo("bottom-reserved-space", anchor: .bottom)
                     }
                 }
@@ -313,6 +324,7 @@ struct PhotoCell: View {
     @Binding var selectedPhotos: [PHAsset]
 
     @State private var thumbnail: UIImage?
+    @State private var videoDuration: String = ""
 
     private var isSelected: Bool {
         selectedPhotos.contains(where: { $0.localIdentifier == asset.localIdentifier })
@@ -320,6 +332,10 @@ struct PhotoCell: View {
 
     private var selectionIndex: Int? {
         selectedPhotos.firstIndex(where: { $0.localIdentifier == asset.localIdentifier })
+    }
+    
+    private var isVideo: Bool {
+        asset.mediaType == .video
     }
 
     var body: some View {
@@ -340,6 +356,30 @@ struct PhotoCell: View {
                 }
             }
             .aspectRatio(1, contentMode: .fit)
+            
+            // 视频标识
+            if isVideo {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        HStack(spacing: 2) {
+                            Image(systemName: "video.fill")
+                                .font(.system(size: 8))
+                            if !videoDuration.isEmpty {
+                                Text(videoDuration)
+                                    .font(.system(size: 8, weight: .medium))
+                            }
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.black.opacity(0.6))
+                        .cornerRadius(4)
+                        .padding(4)
+                    }
+                }
+            }
 
             // 选中遮罩
             if isSelected {
@@ -371,6 +411,9 @@ struct PhotoCell: View {
         }
         .onAppear {
             loadThumbnail()
+            if isVideo {
+                loadVideoDuration()
+            }
         }
     }
 
@@ -379,8 +422,24 @@ struct PhotoCell: View {
             if let index = selectedPhotos.firstIndex(where: { $0.localIdentifier == asset.localIdentifier }) {
                 selectedPhotos.remove(at: index)
             } else {
-                if selectedPhotos.count < 20 {
-                    selectedPhotos.append(asset)
+                // 视频只能单选，且不能与图片混选
+                if isVideo {
+                    // 如果已选的有图片，清空后只选视频
+                    if selectedPhotos.contains(where: { $0.mediaType == .image }) {
+                        selectedPhotos.removeAll()
+                    }
+                    // 视频只能选一个
+                    if selectedPhotos.isEmpty {
+                        selectedPhotos.append(asset)
+                    }
+                } else {
+                    // 图片模式：如果已选的有视频，不能选图片
+                    if selectedPhotos.contains(where: { $0.mediaType == .video }) {
+                        return
+                    }
+                    if selectedPhotos.count < 20 {
+                        selectedPhotos.append(asset)
+                    }
                 }
             }
         }
@@ -403,6 +462,19 @@ struct PhotoCell: View {
             }
         }
     }
+    
+    private func loadVideoDuration() {
+        let duration = asset.duration
+        let seconds = Int(duration)
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        
+        if minutes > 0 {
+            videoDuration = String(format: "%d:%02d", minutes, remainingSeconds)
+        } else {
+            videoDuration = String(format: "0:%02d", remainingSeconds)
+        }
+    }
 }
 
 // MARK: - 加载占位符
@@ -412,7 +484,7 @@ struct LoadingPlaceholder: View {
             ProgressView()
                 .scaleEffect(1.2)
 
-            Text("正在加载照片...")
+            Text("正在加载...")
                 .font(.system(size: 15))
                 .foregroundStyle(.secondary)
         }
@@ -427,7 +499,7 @@ struct EmptyPhotoView: View {
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary.opacity(0.5))
 
-            Text("相册中没有照片")
+            Text("相册中没有内容")
                 .font(.system(size: 18, weight: .medium))
                 .foregroundStyle(.secondary)
         }
@@ -588,30 +660,51 @@ class StitchingViewModel: ObservableObject {
     private var processingTask: Task<Void, Never>?
 
     func startStitching(assets: [PHAsset]) {
-        guard assets.count >= 2 else {
+        // 判断选择类型
+        let hasVideo = assets.contains { $0.mediaType == .video }
+        let hasImage = assets.contains { $0.mediaType == .image }
+        
+        // 视频不支持多选，也不支持与图片混选
+        if hasVideo && hasImage {
+            error = StitchingError.custom("请单独选择视频进行处理，不要同时选择图片和视频")
+            return
+        }
+        
+        if hasVideo && assets.count > 1 {
+            error = StitchingError.custom("一次只能处理一个视频")
+            return
+        }
+        
+        // 图片模式至少需要 2 张
+        if !hasVideo && assets.count < 2 {
             error = StitchingError.insufficientImages
             return
         }
 
         isProcessing = true
         progress = 0
-        statusText = "加载图片..."
+        statusText = hasVideo ? "分析视频中..." : "加载图片..."
         stitchedImage = nil
         error = nil
 
         processingTask = Task {
             do {
-                // 加载所有图片
-                let images = try await loadImages(from: assets)
-
-                // 更新进度
-                await MainActor.run {
-                    self.progress = 0.3
-                    self.statusText = "检测重叠区域..."
+                let result: UIImage
+                
+                if hasVideo, let videoAsset = assets.first {
+                    // 视频处理路径
+                    result = try await processVideo(asset: videoAsset)
+                } else {
+                    // 图片处理路径（原有逻辑）
+                    let images = try await loadImages(from: assets)
+                    
+                    await MainActor.run {
+                        self.progress = 0.3
+                        self.statusText = "检测重叠区域..."
+                    }
+                    
+                    result = try await performStitching(images: images)
                 }
-
-                // 执行拼接
-                let result = try await performStitching(images: images)
 
                 await MainActor.run {
                     self.stitchedImage = result
@@ -639,6 +732,40 @@ class StitchingViewModel: ObservableObject {
         processingTask?.cancel()
         isProcessing = false
     }
+
+    // MARK: - 视频处理
+    
+    private func processVideo(asset: PHAsset) async throws -> UIImage {
+        let progress = StitchingProgress()
+        
+        // 使用 actor-isolated 方式更新进度
+        let progressTask = Task {
+            for await _ in Timer.publish(every: 0.1, on: .main, in: .common).autoconnect().values {
+                await MainActor.run {
+                    self.progress = progress.currentProgress
+                    self.statusText = progress.currentPhase.rawValue
+                }
+            }
+        }
+        
+        // 步骤 1：视频转帧
+        let converter = VideoToFramesConverter()
+        let frames = try await converter.convertToFrames(from: asset, progress: progress)
+        
+        progressTask.cancel()
+        
+        await MainActor.run {
+            self.progress = 0.3
+            self.statusText = "检测重叠区域..."
+        }
+        
+        // 步骤 2：复用现有的照片拼接逻辑
+        let result = try await performStitching(images: frames)
+        
+        return result
+    }
+
+    // MARK: - 图片处理（原有逻辑）
 
     private func loadImages(from assets: [PHAsset]) async throws -> [UIImage] {
         var images: [UIImage] = []
@@ -699,10 +826,24 @@ class StitchingViewModel: ObservableObject {
 
 }
 
-enum StitchingError: Error {
+enum StitchingError: Error, LocalizedError {
     case insufficientImages
     case loadFailed
     case stitchingFailed
+    case custom(String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .insufficientImages:
+            return "需要至少两张图片进行拼接"
+        case .loadFailed:
+            return "图片加载失败"
+        case .stitchingFailed:
+            return "拼接失败"
+        case .custom(let message):
+            return message
+        }
+    }
 }
 
 // MARK: - 预览

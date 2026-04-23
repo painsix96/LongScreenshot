@@ -32,14 +32,21 @@ struct VerticalOffsetMatcher {
 
     private let logger = Logger(subsystem: "com.longscreenshot", category: "VerticalOffsetMatcher")
 
-    /// 模板高度（像素），默认 120px
-    var templateHeight: Int = 120
+    /// 模板高度（像素），默认 200px
+    /// 注：增大模板高度提高匹配准确性，特别是对于包含图片等复杂内容的截图
+    var templateHeight: Int = 200
 
-    /// 次优匹配比率阈值，默认 0.8（最优 SAD 必须 < 次优 SAD * 0.8）
-    var secondBestRatio: Float = 0.8
+    /// 次优匹配比率阈值，默认 0.95（最优 SAD 必须 < 次优 SAD * 0.95）
+    /// 注：放宽阈值以应对滚动幅度小、内容相似度高的场景
+    var secondBestRatio: Float = 0.95
 
-    /// 搜索范围比例，默认 0.6（搜索第二帧顶部 60% 高度）
-    var searchRangeRatio: Float = 0.6
+    /// 绝对质量阈值：最佳匹配的相似度超过此值时，可跳过唯一性检查
+    /// 相似度 = 1 - (bestSAD / 最大可能差值)，范围 0~1
+    var absoluteQualityThreshold: Float = 0.92
+
+    /// 搜索范围比例，默认 0.8（搜索第二帧顶部 80% 高度）
+    /// 注：增大搜索范围以覆盖更多可能的匹配位置
+    var searchRangeRatio: Float = 0.8
 
     /// 匹配相邻两帧内容区，计算垂直偏移量
     /// - Parameters:
@@ -138,9 +145,24 @@ struct VerticalOffsetMatcher {
             return nil
         }
 
-        guard bestSAD < secondBestSAD * secondBestRatio else {
-            logger.warning("⚠️ 匹配不唯一: bestSAD=\(bestSAD) >= secondBestSAD * \(secondBestRatio)=\(secondBestSAD * secondBestRatio)")
+        // 计算绝对相似度质量（0~1，越接近1表示匹配越好）
+        let maxPossibleSAD = Float(templatePixelCount) * 255.0
+        let absoluteQuality = 1.0 - (bestSAD / maxPossibleSAD)
+        logger.info("🔍 绝对质量: similarity=\(absoluteQuality)")
+
+        // 验证策略：
+        // 1. 如果绝对质量很高（如 > 0.92），说明匹配本身很可靠，放宽唯一性要求
+        // 2. 否则，仍要求最佳匹配明显优于次优匹配
+        let isHighQuality = absoluteQuality >= absoluteQualityThreshold
+        let isUnique = bestSAD < secondBestSAD * secondBestRatio
+
+        if !isUnique && !isHighQuality {
+            logger.warning("⚠️ 匹配不唯一且质量不足: bestSAD=\(bestSAD) >= secondBestSAD * \(secondBestRatio)=\(secondBestSAD * secondBestRatio), quality=\(absoluteQuality) < \(absoluteQualityThreshold)")
             return nil
+        }
+
+        if isHighQuality && !isUnique {
+            logger.info("✅ 绝对质量足够高(\(absoluteQuality))，跳过唯一性检查")
         }
 
         let result = VerticalOffsetMatchResult(
