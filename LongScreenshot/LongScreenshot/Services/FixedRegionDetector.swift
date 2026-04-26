@@ -113,21 +113,45 @@ struct FixedRegionDetector {
         // 从底部向上扫描，找到第一个差异超过阈值的行（忽略小干扰区域）
         var bottomFixedHeight = 0
         var consecutiveDiffRows = 0
-        let minInterferenceHeight = 50 // 最小干扰区域高度
+        let minInterferenceHeight = 50
+        let maxScanRatio: Float = 0.25
+        let maxScanHeight = Int(Float(height) * maxScanRatio)
+        var foundByOriginalLogic = false
+        
+        // 同时记录从底部开始的最长连续非差异行
+        var longestConsecutiveNonDiffFromBottom = 0
+        var currentConsecutiveNonDiff = 0
         
         for row in (0..<height).reversed() {
+            let currentScanHeight = height - 1 - row
+            
+            // 检查是否超过扫描上限
+            if currentScanHeight > maxScanHeight {
+                logger.debug("⚠️ 扫描超过上限 \(maxScanHeight)px，触发熔断机制")
+                break
+            }
+            
             if rowDiffs[row] > differenceThreshold {
                 consecutiveDiffRows += 1
+                currentConsecutiveNonDiff = 0
             } else {
-                // 如果遇到连续的非差异行，重置计数
                 consecutiveDiffRows = 0
+                currentConsecutiveNonDiff += 1
+                longestConsecutiveNonDiffFromBottom = max(longestConsecutiveNonDiffFromBottom, currentConsecutiveNonDiff)
             }
             
             // 只有当连续差异行达到最小干扰高度时，才认为找到真正的边界
             if consecutiveDiffRows >= minInterferenceHeight {
                 bottomFixedHeight = height - 1 - row
+                foundByOriginalLogic = true
                 break
             }
+        }
+        
+        // 如果是熔断停止的，使用从底部开始的最长连续非差异行
+        if !foundByOriginalLogic {
+            bottomFixedHeight = longestConsecutiveNonDiffFromBottom
+            logger.debug("🔄 使用熔断机制: 底部最长连续非差异行 = \(bottomFixedHeight)px")
         }
 
         logger.info("✅ 固定区域检测完成: 顶部=\(topFixedHeight)px, 底部=\(bottomFixedHeight)px")

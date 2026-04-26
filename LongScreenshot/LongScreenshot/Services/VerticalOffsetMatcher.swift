@@ -146,8 +146,8 @@ struct VerticalOffsetMatcher {
         }
 
         // 计算绝对相似度质量（0~1，越接近1表示匹配越好）
-        let maxPossibleSAD = Float(templatePixelCount) * 255.0
-        let absoluteQuality = 1.0 - (bestSAD / maxPossibleSAD)
+        let maxPossibleSAD = Float(templatePixelCount) * Float(255.0)
+        let absoluteQuality = Float(1.0) - (bestSAD / maxPossibleSAD)
         logger.info("🔍 绝对质量: similarity=\(absoluteQuality)")
 
         // 验证策略：

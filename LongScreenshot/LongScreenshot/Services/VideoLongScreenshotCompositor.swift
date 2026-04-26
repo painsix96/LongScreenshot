@@ -104,34 +104,26 @@ struct VideoLongScreenshotCompositor {
         let totalFrames = contentImages.count
 
         for i in 1..<contentImages.count {
-            let prevContent = contentImages[lastSuccessIndex]
-            let currContent = contentImages[i]
-
             let isLastFrame = i == totalFrames - 1
-            let hasManySkips = consecutiveSkips >= 3
-
-            if isLastFrame || hasManySkips {
-                matcher.absoluteQualityThreshold = 0.85
-                matcher.secondBestRatio = 0.98
-                if isLastFrame {
-                    logger.debug("🔄 最后一帧: 放宽阈值以捕获底部内容")
+            var result: VideoVerticalOffsetMatchResult? = nil
+            var usedBaseIndex = lastSuccessIndex
+            
+            func performMatch(baseIndex: Int, qualityThreshold: Float, uniquenessRatio: Float) -> VideoVerticalOffsetMatchResult? {
+                matcher.absoluteQualityThreshold = qualityThreshold
+                matcher.secondBestRatio = uniquenessRatio
+                
+                let prevContent = contentImages[baseIndex]
+                let currContent = contentImages[i]
+                
+                if let prevGray = contentGrayscaleList[baseIndex],
+                   let currGray = contentGrayscaleList[i] {
+                    return matcher.match(prevGray: prevGray, currGray: currGray)
                 } else {
-                    logger.debug("🔄 连续跳过\(consecutiveSkips)帧: 放宽阈值尝试匹配")
+                    return matcher.match(prevContent: prevContent, currContent: currContent)
                 }
-            } else {
-                matcher.absoluteQualityThreshold = 0.92
-                matcher.secondBestRatio = 0.95
             }
-
-            let result: VideoVerticalOffsetMatchResult?
-            if let prevGray = contentGrayscaleList[lastSuccessIndex],
-               let currGray = contentGrayscaleList[i] {
-                result = matcher.match(prevGray: prevGray, currGray: currGray)
-            } else {
-                result = matcher.match(prevContent: prevContent, currContent: currContent)
-            }
-
-            if let result = result {
+            
+            func validateResult(_ result: VideoVerticalOffsetMatchResult) -> Bool {
                 let matchedY = result.matchedY
                 let scrollOffset = result.scrollOffset
                 let templateHeight = result.templateHeight
@@ -139,28 +131,140 @@ struct VideoLongScreenshotCompositor {
                 let secondBestSAD = result.secondBestSAD
                 
                 let minReasonableY = contentHeight / 4
-                let maxReasonableY = contentHeight - templateHeight - 100
+                let maxReasonableY = contentHeight - templateHeight
                 
-                let minReasonableOffset = 10
-                let maxReasonableOffset = Int(Double(contentHeight) * 0.8)
+                let minReasonableOffset = 5
+                let maxReasonableOffset = contentHeight
                 
                 let isSADUnique: Bool
                 if secondBestSAD > 0 {
                     let sadRatio = bestSAD / secondBestSAD
-                    isSADUnique = sadRatio < 0.995
+                    isSADUnique = sadRatio < 0.998
                 } else {
                     isSADUnique = true
                 }
                 
                 let isMatchedYReasonable = matchedY >= minReasonableY && matchedY <= maxReasonableY
-                let isScrollOffsetReasonable = scrollOffset > minReasonableOffset && scrollOffset < maxReasonableOffset
+                let isScrollOffsetReasonable = scrollOffset > minReasonableOffset && scrollOffset <= maxReasonableOffset
                 
-                if isMatchedYReasonable && isScrollOffsetReasonable && isSADUnique {
+                return isMatchedYReasonable && isScrollOffsetReasonable && isSADUnique
+            }
+            
+            func performMatchWithTemplateHeight(baseIndex: Int, qualityThreshold: Float, uniquenessRatio: Float, templateHeight: Int) -> VideoVerticalOffsetMatchResult? {
+                matcher.templateHeight = templateHeight
+                matcher.absoluteQualityThreshold = qualityThreshold
+                matcher.secondBestRatio = uniquenessRatio
+                
+                let prevContent = contentImages[baseIndex]
+                let currContent = contentImages[i]
+                
+                if let prevGray = contentGrayscaleList[baseIndex],
+                   let currGray = contentGrayscaleList[i] {
+                    return matcher.match(prevGray: prevGray, currGray: currGray)
+                } else {
+                    return matcher.match(prevContent: prevContent, currContent: currContent)
+                }
+            }
+            
+            func tryMultipleStrategies(baseIndex: Int) -> VideoVerticalOffsetMatchResult? {
+                let templateHeights = [200, 100, 50]
+                
+                for templateHeight in templateHeights {
+                    let qualityThreshold: Float = consecutiveSkips >= 2 ? 0.7 : (consecutiveSkips >= 1 ? 0.8 : 0.92)
+                    let uniquenessRatio: Float = consecutiveSkips >= 2 ? 0.995 : (consecutiveSkips >= 1 ? 0.98 : 0.95)
+                    
+                    if let result = performMatchWithTemplateHeight(baseIndex: baseIndex, qualityThreshold: qualityThreshold, uniquenessRatio: uniquenessRatio, templateHeight: templateHeight) {
+                        if consecutiveSkips >= 2 {
+                            logger.info("⚠️ 连续跳过\(consecutiveSkips)帧，接受模板高度\(templateHeight)的匹配结果")
+                            return result
+                        }
+                        
+                        if validateResult(result) {
+                            logger.info("✅ 模板高度\(templateHeight)匹配成功")
+                            return result
+                        }
+                    }
+                }
+                return nil
+            }
+            
+            if isLastFrame {
+                logger.info("🔄 最后一帧: 尝试多种策略确保匹配成功")
+                
+                result = tryMultipleStrategies(baseIndex: lastSuccessIndex)
+                if result == nil, i > 1 {
+                    result = tryMultipleStrategies(baseIndex: i - 1)
+                    usedBaseIndex = i - 1
+                }
+                
+                if result == nil {
+                    logger.info("⚠️ 最后一帧所有策略都失败，强制拼接")
+                    let estimatedOffset = max(100, lastMatchedScrollOffset ?? 200)
+                    let fallbackResult = VideoVerticalOffsetMatchResult(
+                        matchedY: max(contentHeight / 4, contentHeight - 200 - estimatedOffset),
+                        templateHeight: 100,
+                        contentHeight: contentHeight,
+                        bestSAD: 1000000,
+                        secondBestSAD: 2000000
+                    )
+                    result = fallbackResult
+                }
+            } else if consecutiveSkips >= 2 {
+                logger.info("🔄 连续跳过\(consecutiveSkips)帧: 积极尝试多种策略")
+                
+                result = tryMultipleStrategies(baseIndex: lastSuccessIndex)
+                if result == nil {
+                    result = tryMultipleStrategies(baseIndex: i - 1)
+                    usedBaseIndex = i - 1
+                }
+                
+                if result != nil {
+                    logger.info("✅ 找到匹配结果，接受它")
+                } else {
+                    logger.info("⚠️ 所有策略都失败，强制拼接")
+                    let estimatedOffset = max(80, lastMatchedScrollOffset ?? 150)
+                    let fallbackResult = VideoVerticalOffsetMatchResult(
+                        matchedY: max(contentHeight / 4, contentHeight - 100 - estimatedOffset),
+                        templateHeight: 50,
+                        contentHeight: contentHeight,
+                        bestSAD: 1000000,
+                        secondBestSAD: 2000000
+                    )
+                    result = fallbackResult
+                }
+            } else if consecutiveSkips >= 1 {
+                logger.info("🔄 跳过\(consecutiveSkips)帧: 尝试多种模板高度")
+                
+                result = tryMultipleStrategies(baseIndex: lastSuccessIndex)
+                if result == nil {
+                    result = tryMultipleStrategies(baseIndex: i - 1)
+                    usedBaseIndex = i - 1
+                }
+            } else {
+                result = performMatchWithTemplateHeight(baseIndex: lastSuccessIndex, qualityThreshold: 0.92, uniquenessRatio: 0.95, templateHeight: 200)
+                
+                if let r = result, !validateResult(r) {
+                    logger.info("🔄 lastSuccessIndex 匹配不理想，尝试 i-1")
+                    result = performMatchWithTemplateHeight(baseIndex: i - 1, qualityThreshold: 0.88, uniquenessRatio: 0.97, templateHeight: 200)
+                    usedBaseIndex = i - 1
+                }
+            }
+            
+            if let result = result {
+                let matchedY = result.matchedY
+                let scrollOffset = result.scrollOffset
+                let templateHeight = result.templateHeight
+                let bestSAD = result.bestSAD
+                let secondBestSAD = result.secondBestSAD
+                
+                let isValid = validateResult(result)
+                
+                if isValid || isLastFrame || consecutiveSkips >= 1 {
                     var shouldStop = false
-                    if let lastOffset = lastMatchedScrollOffset {
-                        if scrollOffset < lastOffset && Float(lastOffset - scrollOffset) / Float(lastOffset) > 0.4 {
+                    if !isLastFrame && consecutiveSkips < 5, let lastOffset = lastMatchedScrollOffset {
+                        if scrollOffset < lastOffset && Float(lastOffset - scrollOffset) / Float(lastOffset) > 0.6 {
                             consecutiveOffsetDecreasing += 1
-                            if consecutiveOffsetDecreasing >= 2 {
+                            if consecutiveOffsetDecreasing >= 4 {
                                 logger.warning("⚠️ 检测到进入静止区：连续\(consecutiveOffsetDecreasing)帧scrollOffset变小，停止匹配")
                                 shouldStop = true
                             }
@@ -171,7 +275,13 @@ struct VideoLongScreenshotCompositor {
                     
                     if shouldStop {
                         consecutiveSkips += 1
-                        break
+                        if !isLastFrame {
+                            continue
+                        }
+                    }
+                    
+                    if !isValid {
+                        logger.info("⚠️ 接受不完美的匹配结果（连续跳过\(consecutiveSkips)帧）")
                     }
                     
                     matchResults.append(result)
@@ -179,12 +289,14 @@ struct VideoLongScreenshotCompositor {
                     lastSuccessIndex = i
                     lastMatchedScrollOffset = scrollOffset
                     consecutiveSkips = 0
-                    logger.info("📐 第 \(i) 帧: matchedY=\(result.matchedY), scrollOffset=\(result.scrollOffset)px")
+                    logger.info("📐 第 \(i) 帧 (基准:\(usedBaseIndex), 模板:\(result.templateHeight)px): matchedY=\(result.matchedY), scrollOffset=\(result.scrollOffset)px")
                 } else {
                     var skipReason = ""
-                    if !isMatchedYReasonable {
+                    let minReasonableY = contentHeight / 4
+                    let maxReasonableY = contentHeight - templateHeight
+                    if !(matchedY >= minReasonableY && matchedY <= maxReasonableY) {
                         skipReason += "matchedY(\(matchedY))不在合理范围[\(minReasonableY)-\(maxReasonableY)"
-                    } else if !isScrollOffsetReasonable {
+                    } else if !(scrollOffset > 5 && scrollOffset <= contentHeight) {
                         skipReason += "scrollOffset(\(scrollOffset))不在合理范围"
                     } else {
                         skipReason += "SAD匹配不唯一(best=\(bestSAD), second=\(secondBestSAD))"

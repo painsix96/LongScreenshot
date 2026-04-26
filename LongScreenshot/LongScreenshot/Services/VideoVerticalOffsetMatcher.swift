@@ -232,8 +232,8 @@ struct VideoVerticalOffsetMatcher {
             return nil
         }
 
-        let maxPossibleSAD = Float(templatePixelCount) * 255.0
-        let absoluteQuality = 1.0 - (bestSAD / maxPossibleSAD)
+        let maxPossibleSAD = Float(templatePixelCount) * Float(255.0)
+        let absoluteQuality = Float(1.0) - (bestSAD / maxPossibleSAD)
         logger.info("🔍 绝对质量: similarity=\(absoluteQuality)")
 
         let isHighQuality = absoluteQuality >= absoluteQualityThreshold
