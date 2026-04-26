@@ -3,6 +3,12 @@ import AVFoundation
 import Accelerate
 import os.log
 
+struct FrameGrayscaleData {
+    let pixels: [UInt8]
+    let width: Int
+    let height: Int
+}
+
 // MARK: - 视频帧提取器（基于位移的自适应采样）
 
 /// 基于视觉位移的自适应关键帧提取算法
@@ -52,7 +58,7 @@ actor VideoFrameExtractor {
         from asset: AVAsset,
         timeRange: CMTimeRange? = nil,
         progress: StitchingProgress
-    ) async throws -> [UIImage] {
+    ) async throws -> ([UIImage], [FrameGrayscaleData?]) {
         let duration = try await asset.load(.duration)
         let effectiveRange = timeRange ?? CMTimeRange(start: .zero, duration: duration)
         let rangeDuration = CMTimeGetSeconds(effectiveRange.duration)
@@ -63,8 +69,7 @@ actor VideoFrameExtractor {
         progress.updatePhase(.loading)
         progress.updatePhaseProgress(.loading, progress: 0.05)
 
-        // 阶段 1：自适应步长提取分析帧 + 逐帧计算垂直位移
-        let (analysisFrames, rawDisplacements, frameTimes) = try await extractAndComputeDisplacements(
+        let (analysisFrames, analysisGrayscaleData, rawDisplacements, frameTimes) = try await extractAndComputeDisplacements(
             from: asset,
             startTime: startTime,
             duration: rangeDuration,
@@ -77,15 +82,14 @@ actor VideoFrameExtractor {
 
         logger.info("📊 阶段1完成: 分析帧=\(analysisFrames.count), 位移数据=\(rawDisplacements.count)条")
 
-        // 阶段 2：基于原始位移选择关键帧（不平滑，平滑仅用于步长自适应）
         let keyframeIndices = selectKeyframes(from: rawDisplacements, totalFrames: analysisFrames.count)
 
         logger.info("📊 阶段2完成: 选中 \(keyframeIndices.count) 个关键帧")
 
-        // 阶段 3：对大位移区间回溯插入中间帧
-        let (finalIndices, finalFrames, finalTimes) = await backtrackAndInsert(
+        let (finalIndices, finalFrames, finalTimes, finalGrayscaleData) = await backtrackAndInsert(
             keyframeIndices: keyframeIndices,
             analysisFrames: analysisFrames,
+            analysisGrayscaleData: analysisGrayscaleData,
             rawDisplacements: rawDisplacements,
             asset: asset,
             startTime: startTime,
@@ -96,14 +100,13 @@ actor VideoFrameExtractor {
             throw VideoStitchingError.insufficientFrames
         }
 
-        // 输出最终选中的帧信息（索引和时间点）
         let frameInfo = zip(finalIndices, finalTimes).map { idx, time in
             "帧\(idx)@\(String(format: "%.2f", time))s"
         }.joined(separator: ", ")
         logger.info("📸 最终选中帧: \(frameInfo)")
 
         logger.info("✅ 基于位移的帧提取完成: 分析帧=\(analysisFrames.count), 关键帧=\(finalFrames.count)")
-        return finalFrames
+        return (finalFrames, finalGrayscaleData)
     }
 
     // MARK: - 阶段 1：自适应步长提取 + 位移计算
@@ -113,18 +116,20 @@ actor VideoFrameExtractor {
         startTime: Double,
         duration: Double,
         progress: StitchingProgress
-    ) async throws -> ([UIImage], [Int], [Double]) {
+    ) async throws -> ([UIImage], [FrameGrayscaleData?], [Int], [Double]) {
         let imageGenerator = AVAssetImageGenerator(asset: asset)
         imageGenerator.appliesPreferredTrackTransform = true
         imageGenerator.requestedTimeToleranceBefore = .zero
         imageGenerator.requestedTimeToleranceAfter = .zero
 
         var frames: [UIImage] = []
+        var grayscaleDataList: [FrameGrayscaleData?] = []
         var displacements: [Int] = []
         var frameTimes: [Double] = []
         var currentTime = 0.0
         var step = _config.initialStepSeconds
         var prevFrame: UIImage? = nil
+        var prevGrayscale: FrameGrayscaleData? = nil
         let maxAnalysisFrames = _config.maxFrames * 5
 
         while currentTime < duration && frames.count < maxAnalysisFrames {
@@ -135,11 +140,17 @@ actor VideoFrameExtractor {
                 let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
                 let frame = resizeIfNeeded(UIImage(cgImage: cgImage, scale: 1.0, orientation: .up), maxWidth: _config.maxExtractWidth)
 
+                let frameGrayscale = frame.cgImage.flatMap { extractFullGrayscale(from: $0) }
+
                 if let prev = prevFrame {
-                    let deltaY = computeVerticalDisplacement(prev, frame)
+                    let deltaY: Int
+                    if let prevG = prevGrayscale, let currG = frameGrayscale {
+                        deltaY = computeVerticalDisplacementFromGrayscale(prevGray: prevG, currGray: currG)
+                    } else {
+                        deltaY = computeVerticalDisplacement(prev, frame)
+                    }
                     displacements.append(deltaY)
 
-                    // 平滑仅用于步长自适应决策
                     let smoothedDelta = smoothSingleValue(displacements, index: displacements.count - 1)
 
                     if smoothedDelta < Double(_config.stallDeltaThreshold) {
@@ -153,7 +164,9 @@ actor VideoFrameExtractor {
 
                 frames.append(frame)
                 frameTimes.append(currentTime)
+                grayscaleDataList.append(frameGrayscale)
                 prevFrame = frame
+                prevGrayscale = frameGrayscale
 
             } catch {
                 logger.warning("⚠️ 提取分析帧失败 @ \(currentTime)s: \(error.localizedDescription)")
@@ -165,7 +178,7 @@ actor VideoFrameExtractor {
             progress.updatePhaseProgress(.loading, progress: 0.05 + progressValue * 0.65)
         }
 
-        return (frames, displacements, frameTimes)
+        return (frames, grayscaleDataList, displacements, frameTimes)
     }
 
     // MARK: - 阶段 1 核心：垂直位移计算（SAD 模板匹配）
@@ -246,6 +259,85 @@ actor VideoFrameExtractor {
         let displacement = templateStart - bestY
 
         logger.debug("📏 位移计算: deltaY=\(displacement)px, bestY=\(bestY), templateStart=\(templateStart), bestSAD=\(bestSAD)")
+
+        return displacement
+    }
+
+    private func computeVerticalDisplacementFromGrayscale(
+        prevGray: FrameGrayscaleData,
+        currGray: FrameGrayscaleData
+    ) -> Int {
+        let height = min(prevGray.height, currGray.height)
+        let width = min(prevGray.width, currGray.width)
+
+        let cropTop = Int(Double(height) * _config.cropTopRatio)
+        let cropBottom = Int(Double(height) * _config.cropBottomRatio)
+        let cropHeight = height - cropTop - cropBottom
+
+        guard cropHeight > _config.templateHeight * 2 else { return 0 }
+        guard cropTop + cropHeight <= prevGray.height,
+              cropTop + cropHeight <= currGray.height else { return 0 }
+
+        let prevCroppedPixels = Array(prevGray.pixels[cropTop * prevGray.width ..< (cropTop + cropHeight) * prevGray.width])
+        let currCroppedPixels = Array(currGray.pixels[cropTop * currGray.width ..< (cropTop + cropHeight) * currGray.width])
+
+        let effectiveWidth = width
+        let effectiveHeight = cropHeight
+
+        let tHeight = min(_config.templateHeight, effectiveHeight / 2)
+        let templateStart = effectiveHeight - tHeight
+        let templatePixelCount = tHeight * effectiveWidth
+
+        var templatePixels = [UInt8](repeating: 0, count: templatePixelCount)
+        for row in 0..<tHeight {
+            let srcStart = (templateStart + row) * effectiveWidth
+            let dstStart = row * effectiveWidth
+            _ = templatePixels.withUnsafeMutableBufferPointer { dstPtr in
+                prevCroppedPixels.withUnsafeBufferPointer { srcPtr in
+                    memcpy(dstPtr.baseAddress! + dstStart, srcPtr.baseAddress! + srcStart, effectiveWidth)
+                }
+            }
+        }
+
+        let searchRange = effectiveHeight - tHeight
+        guard searchRange > 0 else { return 0 }
+
+        var templateFloat = [Float](repeating: 0, count: templatePixelCount)
+        vDSP_vfltu8(templatePixels, 1, &templateFloat, 1, vDSP_Length(templatePixelCount))
+
+        var currFloat = [Float](repeating: 0, count: effectiveHeight * effectiveWidth)
+        vDSP_vfltu8(currCroppedPixels, 1, &currFloat, 1, vDSP_Length(effectiveHeight * effectiveWidth))
+
+        var diff = [Float](repeating: 0, count: templatePixelCount)
+        var absDiff = [Float](repeating: 0, count: templatePixelCount)
+
+        var bestSAD: Float = Float.greatestFiniteMagnitude
+        var bestY = 0
+        let templatePixelCountVDSP = vDSP_Length(templatePixelCount)
+
+        for y in 0...searchRange {
+            let candidateStart = y * effectiveWidth
+
+            vDSP_vsub(
+                templateFloat.withUnsafeBufferPointer { $0.baseAddress! }, 1,
+                currFloat.withUnsafeBufferPointer { $0.baseAddress! + candidateStart }, 1,
+                &diff, 1,
+                templatePixelCountVDSP
+            )
+            vDSP_vabs(diff, 1, &absDiff, 1, templatePixelCountVDSP)
+
+            var sad: Float = 0
+            vDSP_sve(absDiff, 1, &sad, templatePixelCountVDSP)
+
+            if sad < bestSAD {
+                bestSAD = sad
+                bestY = y
+            }
+        }
+
+        let displacement = templateStart - bestY
+
+        logger.debug("📏 位移计算(cached): deltaY=\(displacement)px, bestY=\(bestY), templateStart=\(templateStart), bestSAD=\(bestSAD)")
 
         return displacement
     }
@@ -358,30 +450,28 @@ actor VideoFrameExtractor {
     private func backtrackAndInsert(
         keyframeIndices: [Int],
         analysisFrames: [UIImage],
+        analysisGrayscaleData: [FrameGrayscaleData?],
         rawDisplacements: [Int],
         asset: AVAsset,
         startTime: Double,
         frameTimes: [Double]
-    ) async -> ([Int], [UIImage], [Double]) {
+    ) async -> ([Int], [UIImage], [Double], [FrameGrayscaleData?]) {
         var resultFrames: [UIImage] = [analysisFrames[0]]
         var resultIndices: [Int] = [0]
         var resultTimes: [Double] = [frameTimes[0]]
+        var resultGrayscaleData: [FrameGrayscaleData?] = [analysisGrayscaleData.first ?? nil]
 
         for k in 1..<keyframeIndices.count {
             let prevIdx = keyframeIndices[k - 1]
             let currIdx = keyframeIndices[k]
 
-            // 计算这两个关键帧之间的实际累计位移
             let segmentDisplacement = rawDisplacements[prevIdx..<currIdx].reduce(0, +)
 
             if segmentDisplacement > _config.maxOffset {
-                // 大位移区间：在两个关键帧之间插入中间帧
-                // 插入数量 = (位移 / targetOffset) - 1，确保只有位移足够大时才插帧
                 let rawCount = segmentDisplacement / _config.targetOffset
                 let insertCount = max(0, min(rawCount - 1, _config.backtrackMaxSteps))
 
                 if insertCount > 0, prevIdx + 1 < currIdx {
-                    // 从分析帧中均匀选取中间帧
                     let step = Double(currIdx - prevIdx) / Double(insertCount + 1)
                     for j in 1...insertCount {
                         let midIdx = prevIdx + Int(Double(j) * step)
@@ -389,6 +479,7 @@ actor VideoFrameExtractor {
                             resultFrames.append(analysisFrames[midIdx])
                             resultIndices.append(midIdx)
                             resultTimes.append(frameTimes[midIdx])
+                            resultGrayscaleData.append(midIdx < analysisGrayscaleData.count ? analysisGrayscaleData[midIdx] : nil)
                         }
                     }
                 }
@@ -397,11 +488,12 @@ actor VideoFrameExtractor {
             resultFrames.append(analysisFrames[currIdx])
             resultIndices.append(currIdx)
             resultTimes.append(frameTimes[currIdx])
+            resultGrayscaleData.append(currIdx < analysisGrayscaleData.count ? analysisGrayscaleData[currIdx] : nil)
         }
 
         logger.info("📊 回溯插入: 原始关键帧=\(keyframeIndices.count), 插入后=\(resultFrames.count)")
 
-        return (resultIndices, resultFrames, resultTimes)
+        return (resultIndices, resultFrames, resultTimes, resultGrayscaleData)
     }
 
     // MARK: - 辅助方法
@@ -431,6 +523,29 @@ actor VideoFrameExtractor {
         context.draw(cropped, in: CGRect(x: 0, y: 0, width: width, height: height))
 
         return (pixels, width, height)
+    }
+
+    private func extractFullGrayscale(from cgImage: CGImage) -> FrameGrayscaleData? {
+        let width = cgImage.width
+        let height = cgImage.height
+        guard width > 0, height > 0 else { return nil }
+
+        var pixels = [UInt8](repeating: 0, count: width * height)
+
+        guard let context = CGContext(
+            data: &pixels,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: width,
+            space: CGColorSpaceCreateDeviceGray(),
+            bitmapInfo: CGImageAlphaInfo.none.rawValue
+        ) else { return nil }
+
+        context.interpolationQuality = .none
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        return FrameGrayscaleData(pixels: pixels, width: width, height: height)
     }
 
     private func resizeIfNeeded(_ image: UIImage, maxWidth: CGFloat) -> UIImage {

@@ -56,15 +56,12 @@ struct SettingsView: View {
                         NavigationLink {
                             TutorialView()
                         } label: {
-                            HStack {
-                                SettingsRow(
-                                    icon: "book.open",
-                                    iconColor: .indigo,
-                                    title: "使用教程",
-                                    subtitle: "了解如何使用长截图功能"
-                                )
-                                Spacer()
-                            }
+                            SettingsRow(
+                                icon: "graduationcap.fill",
+                                iconColor: .indigo,
+                                title: "使用教程",
+                                subtitle: "了解如何使用长截图功能"
+                            )
                         }
                     } header: {
                         Text("帮助")
@@ -159,7 +156,6 @@ struct TutorialView: View {
         List {
             Section {
                 VStack(spacing: 20) {
-                    // 应用图标
                     ZStack {
                         RoundedRectangle(cornerRadius: 24, style: .continuous)
                             .fill(
@@ -178,11 +174,9 @@ struct TutorialView: View {
                     }
                     .padding(.top, 20)
 
-                    // 应用名称
                     Text("长截图")
                         .font(.system(size: 28, weight: .bold))
 
-                    // 简介
                     Text("一款简洁高效的长截图拼接工具，帮助你将多张截图无缝拼接成一张完整的长图。")
                         .font(.system(size: 15))
                         .foregroundStyle(.secondary)
@@ -195,15 +189,70 @@ struct TutorialView: View {
                 .listRowBackground(Color.clear)
             }
 
-            Section("使用步骤") {
-                VStack(alignment: .leading, spacing: 16) {
-                    InstructionStep(number: 1, text: "进入首页，浏览系统相册的照片")
-                    InstructionStep(number: 2, text: "点击选择需要拼接的截图（2-20张）")
-                    InstructionStep(number: 3, text: "点击「开始拼接」按钮")
-                    InstructionStep(number: 4, text: "等待自动拼接完成")
-                    InstructionStep(number: 5, text: "保存到相册或分享")
-                }
-                .padding(.vertical, 8)
+            Section("录屏拼接") {
+                VideoTutorialCard(
+                    stepNumber: 1,
+                    icon: "video.fill",
+                    title: "选择视频",
+                    description: "在首页点击选择一个视频（视频会显示时长标识）"
+                )
+                VideoTutorialCard(
+                    stepNumber: 2,
+                    icon: "squares.below.rectangle",
+                    title: "开始拼接",
+                    description: "点击底部「开始拼接」按钮"
+                )
+                VideoTutorialCard(
+                    stepNumber: 3,
+                    icon: "film",
+                    title: "自动分析",
+                    description: "系统自动分析视频并提取画面帧"
+                )
+                VideoTutorialCard(
+                    stepNumber: 4,
+                    icon: "wand.and.stars",
+                    title: "生成长图",
+                    description: "系统自动将视频帧拼接成一张全景长图"
+                )
+                VideoTutorialCard(
+                    stepNumber: 5,
+                    icon: "square.and.arrow.up",
+                    title: "保存分享",
+                    description: "拼接完成后，可保存到相册或直接分享"
+                )
+            }
+
+            Section("多图拼接") {
+                PhotoTutorialCard(
+                    stepNumber: 1,
+                    icon: "photo.stack.fill",
+                    title: "选择图片",
+                    description: "在首页点击选择2-20张截图，选中的图片会显示序号"
+                )
+                PhotoTutorialCard(
+                    stepNumber: 2,
+                    icon: "squares.below.rectangle",
+                    title: "开始拼接",
+                    description: "点击底部「开始拼接」按钮"
+                )
+                PhotoTutorialCard(
+                    stepNumber: 3,
+                    icon: "magnifyingglass",
+                    title: "检测重叠",
+                    description: "系统自动检测图片间的重叠区域"
+                )
+                PhotoTutorialCard(
+                    stepNumber: 4,
+                    icon: "wand.and.stars",
+                    title: "自动拼接",
+                    description: "系统根据重叠区域自动拼接图片"
+                )
+                PhotoTutorialCard(
+                    stepNumber: 5,
+                    icon: "square.and.arrow.up",
+                    title: "保存分享",
+                    description: "拼接完成后，可保存到相册或直接分享"
+                )
             }
 
             Section("常见问题") {
@@ -220,33 +269,92 @@ struct TutorialView: View {
     }
 }
 
-// MARK: - 使用步骤
-struct InstructionStep: View {
-    let number: Int
-    let text: String
+// MARK: - 视频教程卡片
+struct VideoTutorialCard: View {
+    let stepNumber: Int
+    let icon: String
+    let title: String
+    let description: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            // 序号
-            Text("\(number)")
-                .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(.white)
-                .frame(width: 26, height: 26)
-                .background(
-                    Circle()
-                        .fill(.blue)
-                )
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(.indigo.opacity(0.12))
+                    .frame(width: 50, height: 50)
 
-            // 文字
-            Text(text)
-                .font(.system(size: 15))
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
+                Image(systemName: icon)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(.indigo)
+            }
 
-            Spacer()
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text("步骤 \(stepNumber)")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(.indigo))
+
+                    Text(title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.primary)
+                }
+
+                Text(description)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
+        .padding(.vertical, 8)
     }
 }
+
+// MARK: - 照片教程卡片
+struct PhotoTutorialCard: View {
+    let stepNumber: Int
+    let icon: String
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(.green.opacity(0.12))
+                    .frame(width: 50, height: 50)
+
+                Image(systemName: icon)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(.green)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text("步骤 \(stepNumber)")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(.green))
+
+                    Text(title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.primary)
+                }
+
+                Text(description)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+}
+
 
 // MARK: - 常见问题项
 struct FAQItem: View {

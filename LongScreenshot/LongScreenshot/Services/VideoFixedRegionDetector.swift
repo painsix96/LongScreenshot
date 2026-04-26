@@ -26,29 +26,37 @@ struct VideoFixedRegionDetector {
             return (0, 0)
         }
 
-        // 提取所有帧的灰度像素数据和尺寸信息
         let grayDataList = frames.compactMap { extractGrayscaleData(from: $0) }
         guard grayDataList.count == frames.count else {
             logger.error("❌ 部分帧转灰度失败")
             return (0, 0)
         }
 
-        // 确保所有帧尺寸一致
-        let firstSize = grayDataList[0].size
-        let consistentData = grayDataList.filter { $0.size == firstSize }
-        guard consistentData.count == grayDataList.count else {
+        let frameGrayscaleList = grayDataList.map { FrameGrayscaleData(pixels: $0.pixels, width: $0.size.width, height: $0.size.height) }
+        return detect(grayscaleDataList: frameGrayscaleList)
+    }
+
+    func detect(grayscaleDataList: [FrameGrayscaleData]) -> (topHeight: Int, bottomHeight: Int) {
+        guard grayscaleDataList.count >= 2 else {
+            logger.warning("⚠️ 输入帧数不足，至少需要 2 帧，实际 \(grayscaleDataList.count) 帧")
+            return (0, 0)
+        }
+
+        let firstWidth = grayscaleDataList[0].width
+        let firstHeight = grayscaleDataList[0].height
+        let consistentData = grayscaleDataList.filter { $0.width == firstWidth && $0.height == firstHeight }
+        guard consistentData.count == grayscaleDataList.count else {
             logger.error("❌ 帧尺寸不一致")
             return (0, 0)
         }
 
-        let width = firstSize.width
-        let height = firstSize.height
+        let width = firstWidth
+        let height = firstHeight
         let frameCount = consistentData.count
         let pixelCount = width * height
 
         logger.info("🔍 开始检测固定区域: \(width)×\(height), 帧数=\(frameCount)")
 
-        // 一次性将所有帧的像素数据转为 Float 数组
         var floatPixelsList = [[Float]]()
         floatPixelsList.reserveCapacity(frameCount)
         for data in consistentData {
@@ -57,13 +65,11 @@ struct VideoFixedRegionDetector {
             floatPixelsList.append(floatPixels)
         }
 
-        // 计算每一行的多帧 SAD 均值
         var rowDiffs = [Float](repeating: 0, count: height)
 
         let referenceFloat = floatPixelsList[0]
         let rowPixelCount = vDSP_Length(width)
 
-        // 预分配差值数组，避免重复分配
         var rowDiff = [Float](repeating: 0, count: width)
         var rowAbsDiff = [Float](repeating: 0, count: width)
 
@@ -76,8 +82,6 @@ struct VideoFixedRegionDetector {
             for frameIndex in 1..<frameCount {
                 let otherFloat = floatPixelsList[frameIndex]
 
-                // 使用指针偏移代替 ArraySlice，避免每次循环创建新数组
-                // diff = other - ref
                 vDSP_vsub(
                     otherFloat.withUnsafeBufferPointer { $0.baseAddress! + rowStart }, 1,
                     referenceFloat.withUnsafeBufferPointer { $0.baseAddress! + rowStart }, 1,
@@ -85,10 +89,8 @@ struct VideoFixedRegionDetector {
                     rowPixelCount
                 )
 
-                // 计算绝对值
                 vDSP_vabs(rowDiff, 1, &rowAbsDiff, 1, rowPixelCount)
 
-                // 计算均值
                 var meanDiff: Float = 0
                 vDSP_meanv(rowAbsDiff, 1, &meanDiff, rowPixelCount)
 
@@ -101,7 +103,6 @@ struct VideoFixedRegionDetector {
             }
         }
 
-        // 从顶部向下扫描，找到第一个差异超过阈值的行
         var topFixedHeight = 0
         for row in 0..<height {
             if rowDiffs[row] > differenceThreshold {
@@ -110,20 +111,17 @@ struct VideoFixedRegionDetector {
             }
         }
 
-        // 从底部向上扫描，找到第一个差异超过阈值的行（忽略小干扰区域）
         var bottomFixedHeight = 0
         var consecutiveDiffRows = 0
-        let minInterferenceHeight = 50 // 最小干扰区域高度
+        let minInterferenceHeight = 50
 
         for row in (0..<height).reversed() {
             if rowDiffs[row] > differenceThreshold {
                 consecutiveDiffRows += 1
             } else {
-                // 如果遇到连续的非差异行，重置计数
                 consecutiveDiffRows = 0
             }
 
-            // 只有当连续差异行达到最小干扰高度时，才认为找到真正的边界
             if consecutiveDiffRows >= minInterferenceHeight {
                 bottomFixedHeight = height - 1 - row
                 break

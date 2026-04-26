@@ -67,26 +67,51 @@ struct VideoVerticalOffsetMatcher {
             return nil
         }
 
-        // 提取灰度像素数据
         guard let prevGray = extractGrayscalePixels(from: prevContent),
               let currGray = extractGrayscalePixels(from: currContent) else {
             logger.error("❌ 灰度像素提取失败")
             return nil
         }
 
-        // 确保使用统一的宽度（取较小值）
-        let effectiveWidth = min(width, prevGray.width, currGray.width)
-        let effectivePrevHeight = min(prevHeight, prevGray.height)
-        let effectiveCurrHeight = min(currHeight, currGray.height)
+        return matchFromGrayscale(
+            prevPixels: prevGray.pixels, prevWidth: prevGray.width, prevHeight: prevGray.height,
+            currPixels: currGray.pixels, currWidth: currGray.width, currHeight: currGray.height,
+            cgImageWidth: width, cgImagePrevHeight: prevHeight, cgImageCurrHeight: currHeight
+        )
+    }
 
-        // 模板高度：取默认值和实际高度的较小值
+    func match(prevGray: FrameGrayscaleData, currGray: FrameGrayscaleData) -> VideoVerticalOffsetMatchResult? {
+        let prevHeight = prevGray.height
+        let currHeight = currGray.height
+        let width = min(prevGray.width, currGray.width)
+
+        guard width > 0, prevHeight > 0, currHeight > 0 else {
+            logger.error("❌ 灰度数据尺寸无效: prev=\(prevGray.width)×\(prevHeight), curr=\(currGray.width)×\(currHeight)")
+            return nil
+        }
+
+        return matchFromGrayscale(
+            prevPixels: prevGray.pixels, prevWidth: prevGray.width, prevHeight: prevGray.height,
+            currPixels: currGray.pixels, currWidth: currGray.width, currHeight: currGray.height,
+            cgImageWidth: width, cgImagePrevHeight: prevHeight, cgImageCurrHeight: currHeight
+        )
+    }
+
+    private func matchFromGrayscale(
+        prevPixels: [UInt8], prevWidth: Int, prevHeight: Int,
+        currPixels: [UInt8], currWidth: Int, currHeight: Int,
+        cgImageWidth: Int, cgImagePrevHeight: Int, cgImageCurrHeight: Int
+    ) -> VideoVerticalOffsetMatchResult? {
+        let effectiveWidth = min(cgImageWidth, prevWidth, currWidth)
+        let effectivePrevHeight = min(cgImagePrevHeight, prevHeight)
+        let effectiveCurrHeight = min(cgImageCurrHeight, currHeight)
+
         let actualTemplateHeight = min(templateHeight, effectivePrevHeight)
         guard actualTemplateHeight > 0 else {
             logger.error("❌ 模板高度无效: \(actualTemplateHeight)")
             return nil
         }
 
-        // 搜索范围：第二帧全部高度
         let searchRange = min(Int(Float(effectiveCurrHeight) * searchRangeRatio), effectiveCurrHeight - actualTemplateHeight)
         guard searchRange > 0 else {
             logger.error("❌ 搜索范围无效: currHeight=\(effectiveCurrHeight), templateHeight=\(actualTemplateHeight)")
@@ -98,17 +123,14 @@ struct VideoVerticalOffsetMatcher {
         let templatePixelCount = actualTemplateHeight * effectiveWidth
         let templatePixelCountVDSP = vDSP_Length(templatePixelCount)
 
-        // 提取模板：第一帧底部 actualTemplateHeight 行
-        let templatePixels = extractTemplate(pixels: prevGray.pixels, width: effectiveWidth, height: effectivePrevHeight, templateHeight: actualTemplateHeight)
+        let templatePixels = extractTemplate(pixels: prevPixels, width: effectiveWidth, height: effectivePrevHeight, templateHeight: actualTemplateHeight)
 
-        // 预先将模板和当前帧转为 Float 数组
         var templateFloat = [Float](repeating: 0, count: templatePixelCount)
         vDSP_vfltu8(templatePixels, 1, &templateFloat, 1, templatePixelCountVDSP)
 
         var currFloat = [Float](repeating: 0, count: effectiveCurrHeight * effectiveWidth)
-        vDSP_vfltu8(currGray.pixels, 1, &currFloat, 1, vDSP_Length(effectiveCurrHeight * effectiveWidth))
+        vDSP_vfltu8(currPixels, 1, &currFloat, 1, vDSP_Length(effectiveCurrHeight * effectiveWidth))
 
-        // 预分配差值数组
         var diff = [Float](repeating: 0, count: templatePixelCount)
         var absDiff = [Float](repeating: 0, count: templatePixelCount)
 
@@ -116,8 +138,14 @@ struct VideoVerticalOffsetMatcher {
         var bestY = 0
         var secondBestSAD: Float = Float.greatestFiniteMagnitude
 
-        for y in 0...searchRange {
-            // 使用指针偏移代替 ArraySlice
+        let coarseStep = 4
+        let fineRadius = 6
+
+        var coarseBestSAD: Float = Float.greatestFiniteMagnitude
+        var coarseBestY = 0
+        var coarseSecondBestSAD: Float = Float.greatestFiniteMagnitude
+
+        for y in stride(from: 0, through: searchRange, by: coarseStep) {
             let candidateStart = y * effectiveWidth
 
             vDSP_vsub(
@@ -131,32 +159,83 @@ struct VideoVerticalOffsetMatcher {
             var sad: Float = 0
             vDSP_sve(absDiff, 1, &sad, templatePixelCountVDSP)
 
-            // 更新最优和次优
-            if sad < bestSAD {
-                secondBestSAD = bestSAD
-                bestSAD = sad
-                bestY = y
-            } else if sad < secondBestSAD {
-                secondBestSAD = sad
+            if sad < coarseBestSAD {
+                coarseSecondBestSAD = coarseBestSAD
+                coarseBestSAD = sad
+                coarseBestY = y
+            } else if sad < coarseSecondBestSAD {
+                coarseSecondBestSAD = sad
+            }
+        }
+
+        let coarseConfident = coarseSecondBestSAD == Float.greatestFiniteMagnitude || coarseBestSAD < coarseSecondBestSAD * 0.99
+
+        if coarseConfident {
+            let fineStart = max(0, coarseBestY - fineRadius)
+            let fineEnd = min(searchRange, coarseBestY + fineRadius)
+
+            for y in fineStart...fineEnd {
+                let candidateStart = y * effectiveWidth
+
+                vDSP_vsub(
+                    templateFloat.withUnsafeBufferPointer { $0.baseAddress! }, 1,
+                    currFloat.withUnsafeBufferPointer { $0.baseAddress! + candidateStart }, 1,
+                    &diff, 1,
+                    templatePixelCountVDSP
+                )
+                vDSP_vabs(diff, 1, &absDiff, 1, templatePixelCountVDSP)
+
+                var sad: Float = 0
+                vDSP_sve(absDiff, 1, &sad, templatePixelCountVDSP)
+
+                if sad < bestSAD {
+                    secondBestSAD = bestSAD
+                    bestSAD = sad
+                    bestY = y
+                } else if sad < secondBestSAD {
+                    secondBestSAD = sad
+                }
+            }
+
+            logger.info("🔍 粗-细搜索: 粗搜bestY=\(coarseBestY), 细搜范围[\(fineStart)-\(fineEnd)], 最终bestY=\(bestY)")
+        } else {
+            logger.info("🔍 粗搜索置信度不足，回退全范围搜索")
+
+            for y in 0...searchRange {
+                let candidateStart = y * effectiveWidth
+
+                vDSP_vsub(
+                    templateFloat.withUnsafeBufferPointer { $0.baseAddress! }, 1,
+                    currFloat.withUnsafeBufferPointer { $0.baseAddress! + candidateStart }, 1,
+                    &diff, 1,
+                    templatePixelCountVDSP
+                )
+                vDSP_vabs(diff, 1, &absDiff, 1, templatePixelCountVDSP)
+
+                var sad: Float = 0
+                vDSP_sve(absDiff, 1, &sad, templatePixelCountVDSP)
+
+                if sad < bestSAD {
+                    secondBestSAD = bestSAD
+                    bestSAD = sad
+                    bestY = y
+                } else if sad < secondBestSAD {
+                    secondBestSAD = sad
+                }
             }
         }
 
         logger.info("🔍 匹配结果: bestY=\(bestY), bestSAD=\(bestSAD), secondBestSAD=\(secondBestSAD)")
 
-        // 次优匹配验证
         guard secondBestSAD != Float.greatestFiniteMagnitude else {
             logger.warning("⚠️ 只有一个有效匹配位置，无法验证唯一性")
             return nil
         }
 
-        // 计算绝对相似度质量（0~1，越接近1表示匹配越好）
         let maxPossibleSAD = Float(templatePixelCount) * 255.0
         let absoluteQuality = 1.0 - (bestSAD / maxPossibleSAD)
         logger.info("🔍 绝对质量: similarity=\(absoluteQuality)")
 
-        // 验证策略：
-        // 1. 如果绝对质量很高（如 > 0.92），说明匹配本身很可靠，放宽唯一性要求
-        // 2. 否则，仍要求最佳匹配明显优于次优匹配
         let isHighQuality = absoluteQuality >= absoluteQualityThreshold
         let isUnique = bestSAD < secondBestSAD * secondBestRatio
 
