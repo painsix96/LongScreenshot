@@ -255,11 +255,9 @@ struct PhotoGridView: View {
     let columns: [GridItem]
     let isLoading: Bool
     let containerHeight: CGFloat
-    @State private var shouldScrollToBottom = false
 
     var body: some View {
-        ScrollViewReader {
-            scrollView in
+        ScrollViewReader { scrollView in
             ZStack {
                 ScrollView(showsIndicators: false) {
                     if photoAssets.isEmpty {
@@ -275,21 +273,19 @@ struct PhotoGridView: View {
                                 .id(asset.localIdentifier)
                             }
                         }
-                        
-                        // 底部预留空间，高度与底部操作栏一致
-                VStack(spacing: 0) {
-                    Spacer()
-                    Text("共 \(photoAssets.count) 项")
-                        .font(.system(size: 14))
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom, 10)
-                }
-                .frame(height: 60)
-                .id("bottom-reserved-space")
+
+                        VStack(spacing: 0) {
+                            Spacer()
+                            Text("共 \(photoAssets.count) 项")
+                                .font(.system(size: 14))
+                                .foregroundStyle(.secondary)
+                                .padding(.bottom, 10)
+                        }
+                        .frame(height: 60)
+                        .id("bottom-reserved-space")
                     }
                 }
-                
-                // 加载指示器 - 叠加在现有内容上，保持ScrollView结构稳定
+
                 if isLoading {
                     Color(.systemBackground)
                         .ignoresSafeArea()
@@ -299,20 +295,16 @@ struct PhotoGridView: View {
                         }
                 }
             }
-            .onChange(of: photoAssets) {
-                newValue in
-                if !newValue.isEmpty {
-                    // 延迟滚动，确保视图完全更新
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            .onChange(of: photoAssets.count) { newCount in
+                if newCount > 0 {
+                    DispatchQueue.main.async {
                         scrollView.scrollTo("bottom-reserved-space", anchor: .bottom)
                     }
                 }
             }
             .onAppear {
-                // 每次视图出现时都滚动到底部，包括从其他页面返回
                 if !photoAssets.isEmpty {
-                    // 延迟一点时间，确保视图完全加载
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    DispatchQueue.main.async {
                         scrollView.scrollTo("bottom-reserved-space", anchor: .bottom)
                     }
                 }
