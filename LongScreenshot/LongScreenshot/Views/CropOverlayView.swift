@@ -124,7 +124,6 @@ struct CropOverlayView: View {
     // MARK: - Resize Handles
     
     private var resizeHandles: some View {
-        let handleSize = viewModel.handleSize
         let cornerSize: CGFloat = 20
         let edgeHeight: CGFloat = 30
         let edgeWidth: CGFloat = 30
@@ -196,7 +195,6 @@ struct CropOverlayView: View {
     // MARK: - Corner Handle
     
     private func cornerHandle(position: CGPoint, size: CGFloat, anchor: CropResizeAnchor) -> some View {
-        let lineLength = size / 2
         let lineWidth: CGFloat = 3
         
         return Canvas { context, _ in

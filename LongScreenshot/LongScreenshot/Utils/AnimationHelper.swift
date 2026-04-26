@@ -423,9 +423,13 @@ final class LoadingAnimationManager: ObservableObject {
     func simulateProgress(duration: Double = 2.0) {
         startLoading()
 
-        var currentProgress: Double = 0
         let increment = 0.02
         let interval = duration * increment
+
+        final class ProgressBox {
+            var value: Double = 0.0
+        }
+        let progressBox = ProgressBox()
 
         progressTimer?.invalidate()
         progressTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] timer in
@@ -434,13 +438,14 @@ final class LoadingAnimationManager: ObservableObject {
                 return
             }
 
-            currentProgress += increment
+            let newProgress = min(progressBox.value + increment, 1.0)
+            progressBox.value = newProgress
 
             Task { @MainActor in
-                self.updateProgress(currentProgress)
+                self.updateProgress(newProgress)
             }
 
-            if currentProgress >= 1.0 {
+            if newProgress >= 1.0 {
                 timer.invalidate()
                 Task { @MainActor in
                     self.finishLoading()

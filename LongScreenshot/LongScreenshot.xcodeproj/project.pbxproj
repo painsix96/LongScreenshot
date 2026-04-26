@@ -50,6 +50,10 @@
 		D10100000000000000000086 /* NoBounceScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000086 /* NoBounceScrollView.swift */; };
 		D10100000000000000000087 /* VideoFrameExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000087 /* VideoFrameExtractor.swift */; };
 		D10100000000000000000089 /* VideoToFramesConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10200000000000000000089 /* VideoToFramesConverter.swift */; };
+		D1010000000000000000008A /* VideoVerticalOffsetMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000008A /* VideoVerticalOffsetMatcher.swift */; };
+		D1010000000000000000008B /* VideoLongScreenshotCompositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000008B /* VideoLongScreenshotCompositor.swift */; };
+		D1010000000000000000008C /* VideoFixedRegionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000008C /* VideoFixedRegionDetector.swift */; };
+		D1010000000000000000008D /* VideoScreenshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020000000000000000008D /* VideoScreenshotBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +114,10 @@
 		D10200000000000000000086 /* NoBounceScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoBounceScrollView.swift; sourceTree = "<group>"; };
 		D10200000000000000000087 /* VideoFrameExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoFrameExtractor.swift; sourceTree = "<group>"; };
 		D10200000000000000000089 /* VideoToFramesConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoToFramesConverter.swift; sourceTree = "<group>"; };
+		D1020000000000000000008A /* VideoVerticalOffsetMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoVerticalOffsetMatcher.swift; sourceTree = "<group>"; };
+		D1020000000000000000008B /* VideoLongScreenshotCompositor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoLongScreenshotCompositor.swift; sourceTree = "<group>"; };
+		D1020000000000000000008C /* VideoFixedRegionDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoFixedRegionDetector.swift; sourceTree = "<group>"; };
+		D1020000000000000000008D /* VideoScreenshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoScreenshotBuilder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -246,6 +254,10 @@
 				D10200000000000000000085 /* LongScreenshotBuilder.swift */,
 				D10200000000000000000087 /* VideoFrameExtractor.swift */,
 				D10200000000000000000089 /* VideoToFramesConverter.swift */,
+				D1020000000000000000008A /* VideoVerticalOffsetMatcher.swift */,
+				D1020000000000000000008B /* VideoLongScreenshotCompositor.swift */,
+				D1020000000000000000008C /* VideoFixedRegionDetector.swift */,
+				D1020000000000000000008D /* VideoScreenshotBuilder.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -446,6 +458,10 @@
 				D10100000000000000000085 /* LongScreenshotBuilder.swift in Sources */,
 				D10100000000000000000087 /* VideoFrameExtractor.swift in Sources */,
 				D10100000000000000000089 /* VideoToFramesConverter.swift in Sources */,
+				D1010000000000000000008A /* VideoVerticalOffsetMatcher.swift in Sources */,
+				D1010000000000000000008B /* VideoLongScreenshotCompositor.swift in Sources */,
+				D1010000000000000000008C /* VideoFixedRegionDetector.swift in Sources */,
+				D1010000000000000000008D /* VideoScreenshotBuilder.swift in Sources */,
 				D10100000000000000000028 /* AnimationHelper.swift in Sources */,
 				D10100000000000000000029 /* HapticManager.swift in Sources */,
 				D1010000000000000000002A /* PhotoLibraryHelper.swift in Sources */,

@@ -44,8 +44,6 @@ actor VideoToFramesConverter {
     struct Config {
         /// 最大视频时长（秒）
         var maxVideoDuration: TimeInterval = 60
-        /// 是否启用自适应采样
-        var useAdaptiveSampling: Bool = true
         /// 视频提取最大宽度
         var maxExtractWidth: CGFloat = 1080
     }
@@ -92,22 +90,14 @@ actor VideoToFramesConverter {
         progress.updatePhase(.loading)
         progress.updatePhaseProgress(.loading, progress: 0.1)
 
-        // 提取帧（整个视频）
+        // 提取帧（整个视频）- 使用自适应采样
         let frameExtractor = VideoFrameExtractor()
         await frameExtractor.setConfigMaxExtractWidth(_config.maxExtractWidth)
 
-        let frames: [UIImage]
-        if _config.useAdaptiveSampling {
-            frames = try await frameExtractor.extractFramesAdaptive(
-                from: avAsset,
-                progress: progress
-            )
-        } else {
-            frames = try await frameExtractor.extractFrames(
-                from: avAsset,
-                progress: progress
-            )
-        }
+        let frames = try await frameExtractor.extractFramesAdaptive(
+            from: avAsset,
+            progress: progress
+        )
 
         guard frames.count >= 2 else {
             throw VideoStitchingError.insufficientFrames
@@ -120,7 +110,7 @@ actor VideoToFramesConverter {
         return frames
     }
     
-    /// 直接从视频生成长截图（使用新算法）
+    /// 直接从视频生成长截图（使用照片流算法）
     /// - Parameters:
     ///   - videoAsset: 相册中的视频 PHAsset
     ///   - progress: 进度追踪器
@@ -130,14 +120,14 @@ actor VideoToFramesConverter {
         progress: StitchingProgress
     ) async -> UIImage? {
         let startTime = CFAbsoluteTimeGetCurrent()
-        logger.info("🚀 开始视频生成长截图（新算法）")
+        logger.info("🚀 开始视频生成长截图（照片流算法）")
 
         do {
             // 获取视频 AVAsset
             let avAsset = try await loadAVAsset(from: videoAsset)
             let duration = try await avAsset.load(.duration)
             let durationSeconds = CMTimeGetSeconds(duration)
-            
+
             // 获取视频轨道信息
             let tracks = try await avAsset.load(.tracks)
             let videoTracks = tracks.filter { $0.mediaType == .video }
@@ -148,64 +138,46 @@ actor VideoToFramesConverter {
                 let isRotated = abs(preferredTransform.a) < 0.1
                 videoSize = isRotated ? CGSize(width: naturalSize.height, height: naturalSize.width) : naturalSize
             }
-            
+
             logger.info("🎬 视频信息: duration=\(String(format: "%.2f", durationSeconds))s, size=\(Int(videoSize.width))×\(Int(videoSize.height))")
-            
+
             // 检查视频时长
             guard durationSeconds >= 1 else {
                 logger.error("❌ 视频时长过短，至少需要 1 秒")
                 return nil
             }
-            
+
             progress.updatePhase(.loading)
             progress.updatePhaseProgress(.loading, progress: 0.1)
-            
-            // 步骤 0: 智能检测固定区域
-            let fixedAreaStart = CFAbsoluteTimeGetCurrent()
-            let (topCropPixels, bottomCropPixels) = try await detectFixedAreas(from: avAsset, progress: progress)
-            let fixedAreaDuration = CFAbsoluteTimeGetCurrent() - fixedAreaStart
-            
-            logger.info("📊 固定区域检测完成: 顶部 \(topCropPixels)px, 底部 \(bottomCropPixels)px, 耗时 \(String(format: "%.3f", fixedAreaDuration))s")
-            
-            // 步骤 1: 提取并处理帧
+
+            // 步骤 1: 提取完整帧（不裁剪固定区域，交给 VideoScreenshotBuilder 处理）
             let frameExtractionStart = CFAbsoluteTimeGetCurrent()
-            let (processedFrames, topFixedArea, bottomFixedArea) = try await extractAndProcessFrames(from: avAsset, topCrop: topCropPixels, bottomCrop: bottomCropPixels, progress: progress)
+            let frames = try await extractFullFrames(from: avAsset, progress: progress)
             let frameExtractionDuration = CFAbsoluteTimeGetCurrent() - frameExtractionStart
-            
-            logger.info("📊 帧提取完成: 共 \(processedFrames.count) 帧, 耗时 \(String(format: "%.3f", frameExtractionDuration))s")
-            
-            guard processedFrames.count >= 2 else {
+
+            logger.info("📊 帧提取完成: 共 \(frames.count) 帧, 耗时 \(String(format: "%.3f", frameExtractionDuration))s")
+
+            guard frames.count >= 2 else {
                 logger.error("❌ 帧数量不足，无法合成，至少需要 2 帧")
                 return nil
             }
-            
+
             // 记录第一帧的尺寸
-            if let firstFrame = processedFrames.first {
-                logger.info("📐 第一帧尺寸: \(firstFrame.width)×\(firstFrame.height)")
+            if let firstFrame = frames.first {
+                logger.info("📐 第一帧尺寸: \(Int(firstFrame.size.width))×\(Int(firstFrame.size.height))")
             }
-            
-            // 记录固定区域尺寸
-            if let topArea = topFixedArea {
-                logger.info("📐 顶部固定区域尺寸: \(topArea.width)×\(topArea.height)")
-            }
-            if let bottomArea = bottomFixedArea {
-                logger.info("📐 底部固定区域尺寸: \(bottomArea.width)×\(bottomArea.height)")
-            }
-            
+
             progress.updatePhase(.processing)
-            progress.updatePhaseProgress(.processing, progress: 0.7)
-            
-            // 步骤 2: 合成所有帧
-            let compositeStart = CFAbsoluteTimeGetCurrent()
-            let longScreenshot = compositeFrames(processedFrames, topFixedArea: topFixedArea, bottomFixedArea: bottomFixedArea)
-            let compositeDuration = CFAbsoluteTimeGetCurrent() - compositeStart
-            
-            logger.info("📊 合成完成: 耗时 \(String(format: "%.3f", compositeDuration))s")
-            
+            progress.updatePhaseProgress(.processing, progress: 0.5)
+
+            // 步骤 2: 使用 VideoScreenshotBuilder（照片流算法的视频流专用版本）进行拼接
+            let builder = VideoScreenshotBuilder()
+            let longScreenshot = builder.build(frames: frames)
+
             progress.updatePhaseProgress(.processing, progress: 1.0)
-            
+
             let totalDuration = CFAbsoluteTimeGetCurrent() - startTime
-            
+
             if let longScreenshot = longScreenshot {
                 logger.info("✅ 视频生成长截图完成: 最终尺寸 \(Int(longScreenshot.size.width))×\(Int(longScreenshot.size.height)), 总耗时 \(String(format: "%.3f", totalDuration))s")
                 return longScreenshot
@@ -253,7 +225,16 @@ actor VideoToFramesConverter {
         
         return (topCrop, bottomCrop)
     }
-    
+
+    // MARK: - 照片流算法适配
+
+    /// 提取完整视频帧（不裁剪固定区域），使用智能自适应采样
+    private func extractFullFrames(from asset: AVAsset, progress: StitchingProgress) async throws -> [UIImage] {
+        let frameExtractor = VideoFrameExtractor()
+        await frameExtractor.setConfigMaxExtractWidth(_config.maxExtractWidth)
+        return try await frameExtractor.extractFramesAdaptive(from: asset, progress: progress)
+    }
+
     /// 提取关键帧用于固定区域分析
     private func extractKeyFrames(from asset: AVAsset, count: Int) async throws -> [CGImage] {
         let duration = try await asset.load(.duration)
@@ -510,168 +491,6 @@ actor VideoToFramesConverter {
         
         context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
         return pixels
-    }
-    
-    /// 批量提取并处理视频帧
-    private func extractAndProcessFrames(
-        from asset: AVAsset,
-        topCrop: CGFloat,
-        bottomCrop: CGFloat,
-        progress: StitchingProgress
-    ) async throws -> ([CGImage], CGImage?, CGImage?) { // 返回 (内容帧, 顶部固定区域, 底部固定区域)
-        let duration = try await asset.load(.duration)
-        let durationSeconds = CMTimeGetSeconds(duration)
-        
-        // 配置常量
-        let kFrameIntervalSeconds: Double = 1.0 // 增加帧间隔，减少重复内容
-        let kMaxFrameCount: Int = 50
-        let kMaxOutputWidth: CGFloat = 1080
-        
-        logger.info("🔧 帧提取配置: 帧间隔=\(kFrameIntervalSeconds)s, 最大帧数=\(kMaxFrameCount), 最大宽度=\(kMaxOutputWidth)px, 顶部裁剪=\(topCrop)px, 底部裁剪=\(bottomCrop)px")
-        
-        // 计算采样时间点
-        var sampleTimes: [CMTime] = []
-        var currentTime: Double = 0
-        
-        // 根据帧间隔计算时间点
-        while currentTime < durationSeconds && sampleTimes.count < kMaxFrameCount {
-            sampleTimes.append(CMTime(seconds: currentTime, preferredTimescale: 600))
-            currentTime += kFrameIntervalSeconds
-        }
-        
-        // 确保包含最后一帧
-        if let last = sampleTimes.last, durationSeconds - CMTimeGetSeconds(last) > kFrameIntervalSeconds * 0.5 {
-            sampleTimes.append(CMTime(seconds: durationSeconds - 0.01, preferredTimescale: 600))
-        }
-        
-        // 如果帧数超过上限，均匀降采样
-        if sampleTimes.count > kMaxFrameCount {
-            logger.info("📉 帧数超过上限 \(sampleTimes.count)/\(kMaxFrameCount)，进行降采样")
-            let step = Double(sampleTimes.count) / Double(kMaxFrameCount)
-            var thinned: [CMTime] = []
-            for i in 0..<kMaxFrameCount {
-                let index = Int(Double(i) * step)
-                if index < sampleTimes.count {
-                    thinned.append(sampleTimes[index])
-                }
-            }
-            sampleTimes = thinned
-        }
-        
-        logger.info("🎬 计划提取 \(sampleTimes.count) 帧，时间点: \(sampleTimes.map { String(format: "%.2f", CMTimeGetSeconds($0)) }.joined(separator: ", "))")
-        
-        // 使用 AVAssetImageGenerator 批量提取帧
-        return try await withCheckedThrowingContinuation { continuation in
-            // 配置图像生成器
-            let imageGenerator = AVAssetImageGenerator(asset: asset)
-            imageGenerator.appliesPreferredTrackTransform = true
-            imageGenerator.requestedTimeToleranceBefore = .zero
-            imageGenerator.requestedTimeToleranceAfter = .zero
-            
-            // 设置最大尺寸，从源头控制内存
-            imageGenerator.maximumSize = CGSize(width: kMaxOutputWidth, height: 0)
-            logger.info("📐 设置最大提取尺寸: \(kMaxOutputWidth)px")
-            
-            // 准备数据结构
-            var frameData: [(time: CMTime, image: CGImage)] = [] // 保存时间点和图像，用于排序
-            var topFixedArea: CGImage? // 顶部固定区域
-            var bottomFixedArea: CGImage? // 底部固定区域
-            var errors: [Error] = []
-            let totalCount = sampleTimes.count
-            
-            // 转换时间点
-            let timeValues = sampleTimes.map { NSValue(time: $0) }
-            logger.info("🚀 开始批量提取 \(totalCount) 帧")
-            
-            // 批量异步提取
-            imageGenerator.generateCGImagesAsynchronously(forTimes: timeValues) { [self] requestedTime, cgImage, actualTime, result, error in
-                if let error = error {
-                    logger.warning("⚠️ 提取帧失败 @ requested=\(String(format: "%.2f", CMTimeGetSeconds(requestedTime)))s, actual=\(String(format: "%.2f", CMTimeGetSeconds(actualTime)))s: \(error.localizedDescription)")
-                    errors.append(error)
-                } else if let cgImage = cgImage {
-                    logger.debug("🎬 提取帧 @ requested=\(String(format: "%.2f", CMTimeGetSeconds(requestedTime)))s, actual=\(String(format: "%.2f", CMTimeGetSeconds(actualTime)))s, size=\(cgImage.width)×\(cgImage.height)")
-                    
-                    // 提取顶部固定区域（从第一帧）
-                    if topFixedArea == nil && CMTimeGetSeconds(requestedTime) <= 0.1 {
-                        let topRect = CGRect(
-                            x: 0,
-                            y: 0,
-                            width: cgImage.width,
-                            height: Int(topCrop)
-                        )
-                        if let topArea = cgImage.cropping(to: topRect) {
-                            topFixedArea = topArea
-                            logger.debug("✅ 提取顶部固定区域: \(topArea.width)×\(topArea.height)")
-                        }
-                    }
-                    
-                    // 提取底部固定区域（从最后一帧）
-                    if bottomFixedArea == nil && CMTimeGetSeconds(requestedTime) >= durationSeconds - 0.1 {
-                        let bottomRect = CGRect(
-                            x: 0,
-                            y: cgImage.height - Int(bottomCrop),
-                            width: cgImage.width,
-                            height: Int(bottomCrop)
-                        )
-                        if let bottomArea = cgImage.cropping(to: bottomRect) {
-                            bottomFixedArea = bottomArea
-                            logger.debug("✅ 提取底部固定区域: \(bottomArea.width)×\(bottomArea.height)")
-                        }
-                    }
-                    
-                    // 裁剪内容区域
-                    let width = cgImage.width
-                    let height = cgImage.height
-                    
-                    let cropRect = CGRect(
-                        x: 0,
-                        y: CGFloat(Int(topCrop)),
-                        width: CGFloat(width),
-                        height: CGFloat(height) - topCrop - bottomCrop
-                    )
-                    
-                    let cropRectString = String(describing: cropRect)
-                    logger.debug("✂️ 裁剪区域: \(cropRectString)")
-                    
-                    if let croppedImage = cgImage.cropping(to: cropRect) {
-                        logger.debug("✅ 裁剪完成: \(croppedImage.width)×\(croppedImage.height)")
-                        // 使用 actualTime 而不是 requestedTime 来排序，确保顺序正确
-                        frameData.append((time: actualTime, image: croppedImage))
-                    } else {
-                        logger.warning("⚠️ 裁剪失败")
-                    }
-                }
-                
-                // 更新进度
-                let progressValue = Double(frameData.count) / Double(totalCount)
-                progress.updatePhaseProgress(.loading, progress: 0.1 + progressValue * 0.6)
-                
-                // 检查是否完成
-                if frameData.count + errors.count == totalCount {
-                    logger.info("📊 帧提取完成: 成功 \(frameData.count)/\(totalCount) 帧, 失败 \(errors.count) 帧")
-
-                    // 按实际时间顺序排序帧
-                    frameData.sort { CMTimeGetSeconds($0.time) < CMTimeGetSeconds($1.time) }
-                    let sortedFrames = frameData.map { $0.image }
-
-                    // 去除过于相似的帧
-                    let uniqueFrames = filterSimilarFrames(sortedFrames)
-
-                    if uniqueFrames.count >= 2 {
-                        logger.info("✅ 帧处理完成: 原始 \(sortedFrames.count) 帧, 去重后 \(uniqueFrames.count) 帧")
-
-                        // 检测并移除帧之间的重叠区域
-                        let finalFrames = detectAndRemoveOverlaps(from: uniqueFrames)
-                        logger.info("✅ 重叠移除完成: 去重后 \(uniqueFrames.count) 帧, 最终 \(finalFrames.count) 帧")
-
-                        continuation.resume(returning: (finalFrames, topFixedArea, bottomFixedArea))
-                    } else {
-                        logger.error("❌ 有效帧数量不足: \(uniqueFrames.count) 帧")
-                        continuation.resume(throwing: VideoStitchingError.insufficientFrames)
-                    }
-                }
-            }
-        }
     }
     
     /// 过滤过于相似的帧
@@ -941,7 +760,6 @@ actor VideoToFramesConverter {
             return 0
         }
 
-        let scaledWidth = CGFloat(scaledUpper.width)
         let scaledHeight1 = CGFloat(scaledUpper.height)
         let scaledHeight2 = CGFloat(scaledLower.height)
 

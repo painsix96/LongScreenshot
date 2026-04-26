@@ -4,21 +4,25 @@ import os.log
 
 // MARK: - 匹配结果
 
-/// 垂直偏移匹配结果
-struct VerticalOffsetMatchResult {
+/// 垂直偏移匹配结果（视频流专用版本）
+struct VideoVerticalOffsetMatchResult {
     /// 模板在第二帧中的匹配起始行
     let matchedY: Int
     /// 实际使用的模板高度
     let templateHeight: Int
     /// 内容区高度
     let contentHeight: Int
-    
+    /// 最佳匹配的 SAD 值
+    let bestSAD: Float
+    /// 次佳匹配的 SAD 值
+    let secondBestSAD: Float
+
     /// 滚动偏移量：第二帧相对第一帧向下滚动的距离
     /// 计算公式：contentHeight - templateHeight - matchedY
     var scrollOffset: Int { contentHeight - templateHeight - matchedY }
 }
 
-// MARK: - 垂直偏移匹配器
+// MARK: - 垂直偏移匹配器（视频流专用版本）
 
 /// 给定相邻两帧的内容区图像，精确计算第二帧相对第一帧的垂直滚动偏移量
 /// 算法原理：
@@ -28,9 +32,9 @@ struct VerticalOffsetMatchResult {
 /// 4. 对每个位置使用 vDSP 计算 SAD（绝对差值和）
 /// 5. 取 SAD 最小值对应的行为最佳匹配位置
 /// 6. 引入次优匹配验证：最优 SAD 必须小于次优 SAD 的 0.8 倍，否则返回 nil
-struct VerticalOffsetMatcher {
+struct VideoVerticalOffsetMatcher {
 
-    private let logger = Logger(subsystem: "com.longscreenshot", category: "VerticalOffsetMatcher")
+    private let logger = Logger(subsystem: "com.longscreenshot", category: "VideoVerticalOffsetMatcher")
 
     /// 模板高度（像素），默认 200px
     /// 注：增大模板高度提高匹配准确性，特别是对于包含图片等复杂内容的截图
@@ -53,7 +57,7 @@ struct VerticalOffsetMatcher {
     ///   - prevContent: 前一帧的内容区 CGImage（已裁剪掉固定区域）
     ///   - currContent: 当前帧的内容区 CGImage（已裁剪掉固定区域）
     /// - Returns: 匹配结果，包含 matchedY、templateHeight 和 scrollOffset；nil 表示匹配失败
-    func match(prevContent: CGImage, currContent: CGImage) -> VerticalOffsetMatchResult? {
+    func match(prevContent: CGImage, currContent: CGImage) -> VideoVerticalOffsetMatchResult? {
         let width = min(prevContent.width, currContent.width)
         let prevHeight = prevContent.height
         let currHeight = currContent.height
@@ -165,12 +169,14 @@ struct VerticalOffsetMatcher {
             logger.info("✅ 绝对质量足够高(\(absoluteQuality))，跳过唯一性检查")
         }
 
-        let result = VerticalOffsetMatchResult(
+        let result = VideoVerticalOffsetMatchResult(
             matchedY: bestY,
             templateHeight: actualTemplateHeight,
-            contentHeight: effectivePrevHeight
+            contentHeight: effectivePrevHeight,
+            bestSAD: bestSAD,
+            secondBestSAD: secondBestSAD
         )
-        
+
         logger.info("✅ 匹配成功: matchedY=\(bestY), templateHeight=\(actualTemplateHeight), scrollOffset=\(result.scrollOffset)px")
         return result
     }

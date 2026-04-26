@@ -190,12 +190,10 @@ struct PreviewCanvas: View {
             height: drawHeight
         )
         
-        if let cgImage = previewData.topImage.cgImage {
-            context.draw(
-                Image(uiImage: previewData.topImage),
-                in: drawRect
-            )
-        }
+        context.draw(
+            Image(uiImage: previewData.topImage),
+            in: drawRect
+        )
         
         // 添加图片标签
         drawImageLabel(
@@ -219,15 +217,6 @@ struct PreviewCanvas: View {
         
         // 计算第二张图可见区域
         let visibleHeight = (topImageHeight + bottomImageHeight) - stitchY
-        let startYInImage = (imageSize.height * scale - visibleHeight) / scale
-        
-        // 创建裁剪区域
-        let visibleRect = CGRect(
-            x: 0,
-            y: startYInImage,
-            width: imageSize.width,
-            height: imageSize.height - startYInImage
-        )
         
         // 绘制区域
         let drawRect = CGRect(

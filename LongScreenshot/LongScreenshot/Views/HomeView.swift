@@ -59,7 +59,10 @@ struct HomeView: View {
             // 底部操作栏（选择后显示）- 通过VStack覆盖在底部
             VStack {
                 Spacer()
-                if !selectedPhotos.isEmpty {
+                // 显示条件：要么有视频，要么有2张或更多图片
+                let hasVideo = selectedPhotos.contains(where: { $0.mediaType == .video })
+                let hasMultipleImages = selectedPhotos.filter({ $0.mediaType == .image }).count >= 2
+                if hasVideo || hasMultipleImages {
                     BottomActionBar(
                         selectedCount: selectedPhotos.count,
                         onClear: { selectedPhotos.removeAll() },
@@ -424,14 +427,9 @@ struct PhotoCell: View {
             } else {
                 // 视频只能单选，且不能与图片混选
                 if isVideo {
-                    // 如果已选的有图片，清空后只选视频
-                    if selectedPhotos.contains(where: { $0.mediaType == .image }) {
-                        selectedPhotos.removeAll()
-                    }
-                    // 视频只能选一个
-                    if selectedPhotos.isEmpty {
-                        selectedPhotos.append(asset)
-                    }
+                    // 如果已选的有图片或有其他视频，清空后只选当前视频
+                    selectedPhotos.removeAll()
+                    selectedPhotos.append(asset)
                 } else {
                     // 图片模式：如果已选的有视频，不能选图片
                     if selectedPhotos.contains(where: { $0.mediaType == .video }) {
@@ -515,7 +513,6 @@ struct HomeStitchingProgressView: View {
     @State private var showShareSheet = false
     @State private var showExportOptions = false
     @State private var showSaveSuccess = false
-    @State private var showDiscardAlert = false
 
     var body: some View {
         ZStack {
@@ -563,28 +560,7 @@ struct HomeStitchingProgressView: View {
                 }
             }
         }
-        .navigationBarBackButtonHidden(true)
         .toolbar {
-            // 左上方返回按钮
-            ToolbarItem(placement: .topBarLeading) {
-                if viewModel.isProcessing {
-                    Button("取消") {
-                        viewModel.cancelProcessing()
-                        dismiss()
-                    }
-                } else if viewModel.stitchedImage != nil {
-                    Button(action: { showDiscardAlert = true }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                } else if viewModel.error != nil {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                }
-            }
-
             // 右上方导出按钮
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.stitchedImage != nil {
@@ -613,15 +589,6 @@ struct HomeStitchingProgressView: View {
             Button("确定", role: .cancel) {}
         } message: {
             Text("图片已成功保存到相册")
-        }
-        .alert("确认丢弃", isPresented: $showDiscardAlert) {
-            Button("取消", role: .cancel) {}
-            Button("丢弃", role: .destructive) {
-                // 丢弃长截图，不保存
-                dismiss()
-            }
-        } message: {
-            Text("如果不保存的话，刚才生成的长截图会丢失。")
         }
         .onAppear {
             viewModel.startStitching(assets: selectedAssets)

@@ -61,17 +61,15 @@ struct BrushStroke: Annotation, Equatable {
         
         let path = createSmoothPath()
         
-        // 绘制描边
-        var strokeStyle = StrokeStyle(
-            lineWidth: lineWidth,
-            lineCap: .round,
-            lineJoin: .round
-        )
-        
         // 根据压感调整线宽
         if points.count > 1 {
             drawVariableWidthStroke(in: context, path: path)
         } else {
+            let strokeStyle = StrokeStyle(
+                lineWidth: lineWidth,
+                lineCap: .round,
+                lineJoin: .round
+            )
             context.stroke(
                 Path(path),
                 with: .color(color),
@@ -89,7 +87,6 @@ struct BrushStroke: Annotation, Equatable {
         guard points.count >= 2 else { return false }
         
         // 检查点是否接近路径
-        let path = createSmoothPath()
         let tolerance: CGFloat = max(lineWidth, 20.0)
         
         for i in 0..<points.count - 1 {

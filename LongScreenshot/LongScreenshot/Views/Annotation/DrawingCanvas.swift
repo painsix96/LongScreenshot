@@ -67,7 +67,7 @@ struct DrawingCanvas: View {
         if viewModel.isDrawing {
             // 继续绘制
             viewModel.continueDrawing(to: location)
-        } else if let selectedId = viewModel.selectedAnnotationId {
+        } else if viewModel.selectedAnnotationId != nil {
             // 移动选中的标注
             let offset = CGSize(width: translation.width, height: translation.height)
             viewModel.moveSelectedAnnotation(by: offset)
